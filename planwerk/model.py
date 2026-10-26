@@ -85,6 +85,25 @@ class Scheme:
     # Rundung der Einzelbeträge (1, 10 oder 100 EUR)
     rounding_step: float = 1.0
 
+    def __post_init__(self) -> None:
+        errors = []
+        if self.formula not in ("factor", "divisor"):
+            errors.append(f"formula must be 'factor' or 'divisor', not {self.formula!r}")
+        if self.tenure_rounding not in ("months", "full_years", "half_up"):
+            errors.append(f"tenure_rounding {self.tenure_rounding!r} unknown")
+        if self.budget_mode not in ("none", "pro_rata"):
+            errors.append(f"budget_mode {self.budget_mode!r} unknown")
+        if self.divisor <= 0:
+            errors.append("divisor must be > 0")
+        if self.rounding_step <= 0:
+            errors.append("rounding_step must be > 0")
+        for name in ("factor", "floor_amount", "cap_amount", "child_bonus", "disability_bonus",
+                     "budget", "retirement_cap_months", "min_tenure_months", "retirement_age"):
+            if getattr(self, name) < 0:
+                errors.append(f"{name} must not be negative")
+        if errors:
+            raise ValueError("; ".join(errors))
+
     def with_changes(self, **changes: Any) -> "Scheme":
         known = {f.name for f in fields(self)}
         unknown = set(changes) - known
