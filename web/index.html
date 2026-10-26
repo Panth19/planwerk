@@ -1,0 +1,1015 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Planwerk Sozialplan-Rechner</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap">
+<style>
+/* Layout: the agreement is the interface. Left, the Sozialplan as a typeset
+   document whose numbers are its inputs; right, what it costs; below, Anlage 1. */
+:root {
+  --paper: #e9ece6;        /* desk / file-folder grey-green */
+  --sheet: #fbfbf8;        /* the document page */
+  --ink: #1a2130;
+  --ink-2: #545d6b;
+  --ink-3: #7d8591;
+  --rule: #cfd3ca;
+  --rule-soft: #e2e5de;
+  --stamp: #3540b0;        /* rubber-stamp ink, the one accent */
+  --stamp-soft: #e2e4f5;
+  --over: #b42318;
+  --over-soft: #f8e1de;
+  --under: #2c7548;
+  --ochre: #94711a;        /* Sockelbetrag */
+  --plum: #7b4a92;         /* rentennah */
+  --field: #f1f2fb;
+
+  --f-doc: "Literata", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --f-ui: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  --t-xs: 0.78rem; --t-s: 0.875rem; --t-m: 1rem; --t-l: 1.2rem; --t-xl: 1.5rem; --t-xxl: 2.6rem;
+  --r: 3px;
+  --shadow-sheet: 0 1px 0 rgba(26,33,48,.04), 0 12px 28px -18px rgba(26,33,48,.35);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #13161b; --sheet: #1c2027; --ink: #e6e8e3; --ink-2: #a5acb6; --ink-3: #7f8792;
+    --rule: #353b45; --rule-soft: #282d35; --stamp: #9ea6ff; --stamp-soft: #272c4c;
+    --over: #f2776b; --over-soft: #3a2224; --under: #6fc58e; --ochre: #d6ae4c; --plum: #c597dc;
+    --field: #232843; --shadow-sheet: 0 12px 28px -18px rgba(0,0,0,.8);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #13161b; --sheet: #1c2027; --ink: #e6e8e3; --ink-2: #a5acb6; --ink-3: #7f8792;
+  --rule: #353b45; --rule-soft: #282d35; --stamp: #9ea6ff; --stamp-soft: #272c4c;
+  --over: #f2776b; --over-soft: #3a2224; --under: #6fc58e; --ochre: #d6ae4c; --plum: #c597dc;
+  --field: #232843; --shadow-sheet: 0 12px 28px -18px rgba(0,0,0,.8);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 400 var(--t-m)/1.5 var(--f-ui);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap {
+  max-width: 1320px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--stamp); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- top bar ---------- */
+.bar { border-bottom: 1px solid var(--rule); background: var(--paper); }
+.bar .wrap { display: flex; align-items: center; gap: 12px 20px; padding-block: 12px; flex-wrap: wrap; }
+.mark { display: flex; align-items: baseline; gap: 10px; margin-right: auto; min-width: 0; }
+.mark b { font: 600 1.35rem/1 var(--f-doc); letter-spacing: -0.01em; }
+.mark b span { color: var(--stamp); }
+.mark .case { color: var(--ink-2); font-size: var(--t-s); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; font-size: var(--t-xs); font-weight: 500;
+  padding: 2px 8px; border-radius: 999px; border: 1px solid var(--rule); color: var(--ink-2); white-space: nowrap;
+}
+.chip i { width: 7px; height: 7px; border-radius: 50%; background: var(--ochre); display: inline-block; }
+.chip.own i { background: var(--under); }
+.lang { display: inline-flex; border: 1px solid var(--rule); border-radius: var(--r); overflow: hidden; }
+.lang button { border: 0; background: none; padding: 3px 9px; font-size: var(--t-xs); font-weight: 500; cursor: pointer; color: var(--ink-2); }
+.lang button[aria-pressed="true"] { background: var(--ink); color: var(--sheet); }
+
+/* ---------- main grid ---------- */
+main { padding-block: 24px 40px; }
+.grid { display: grid; grid-template-columns: minmax(0, 46fr) minmax(0, 54fr); gap: 24px; align-items: start; }
+@media (max-width: 980px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- the document ---------- */
+.sheet {
+  background: var(--sheet); box-shadow: var(--shadow-sheet); border: 1px solid var(--rule-soft);
+  padding: 36px 40px 30px 64px; font-family: var(--f-doc); font-size: 1.02rem; line-height: 1.68;
+  position: relative;
+}
+@media (max-width: 560px) { .sheet { padding: 24px 18px 22px 18px; } }
+.sheet h1 { font: 600 var(--t-xl)/1.2 var(--f-doc); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+.sheet .parties { margin: 4px 0 22px; color: var(--ink-2); font-size: var(--t-s); }
+.para { position: relative; margin: 0 0 18px; }
+.para h2 { font: 600 var(--t-m)/1.4 var(--f-doc); margin: 0 0 4px; }
+.para h2 .sec { position: absolute; left: -46px; width: 38px; text-align: right; color: var(--ink-3); font-weight: 500; }
+@media (max-width: 560px) { .para h2 .sec { position: static; color: var(--ink-3); margin-right: 6px; } }
+.para p { margin: 0 0 6px; text-wrap: pretty; }
+.para p .abs { color: var(--ink-3); margin-right: 4px; }
+.formula {
+  margin: 8px 0 10px 1.4em; padding: 10px 14px; border-left: 2px solid var(--stamp);
+  background: var(--field); font-size: 1.06rem; line-height: 1.5;
+}
+.formula .op { color: var(--ink-3); padding: 0 .25em; }
+.hint { font-family: var(--f-ui); font-size: var(--t-xs); color: var(--ink-3); border-top: 1px solid var(--rule-soft); padding-top: 12px; margin-top: 22px; }
+
+/* inline fields: the negotiable numbers of the agreement */
+.f {
+  font: 500 1em/1.2 var(--f-ui); color: var(--stamp); background: var(--field);
+  border: 0; border-bottom: 1.5px solid var(--stamp); border-radius: 2px 2px 0 0;
+  padding: 1px 4px; margin: 0 1px; text-align: right; min-width: 3ch; max-width: 100%;
+  transition: background-color .5s ease;
+}
+select.f { text-align: left; padding-right: 2px; cursor: pointer; max-width: 100%; }
+input[type="date"].f { text-align: left; }
+.f:hover { background: var(--stamp-soft); }
+.f[aria-invalid="true"] { color: var(--over); border-bottom-color: var(--over); background: var(--over-soft); }
+.f.flash { background: var(--stamp); color: var(--sheet); }
+.tick { display: inline-flex; align-items: baseline; gap: 6px; cursor: pointer; }
+.tick input { width: 1.05em; height: 1.05em; accent-color: var(--stamp); transform: translateY(2px); cursor: pointer; }
+
+/* ---------- calculation column ---------- */
+.calc { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+@media (min-width: 981px) { .calc { position: sticky; top: 16px; } }
+.panel { background: var(--sheet); border: 1px solid var(--rule-soft); padding: 20px 22px; min-width: 0; }
+.panel h3 { font: 600 var(--t-s)/1.3 var(--f-ui); margin: 0 0 12px; color: var(--ink-2); }
+
+.cost { display: flex; align-items: flex-end; gap: 10px 22px; flex-wrap: wrap; }
+.total { font: 600 var(--t-xxl)/1 var(--f-ui); letter-spacing: -0.02em; }
+.delta { font-size: var(--t-s); color: var(--ink-2); padding-bottom: 4px; }
+.delta.over { color: var(--over); }
+.delta.under { color: var(--under); }
+.costhead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; min-height: 30px; }
+.costhead h3 { margin-bottom: 8px; }
+.stamp {
+  flex: none; font: 600 var(--t-xs)/1 var(--f-ui); letter-spacing: .08em;
+  color: var(--stamp); border: 2px solid var(--stamp); outline: 1px solid var(--stamp); outline-offset: 2px;
+  padding: 6px 9px; border-radius: 3px; transform: rotate(-4deg); opacity: .9; white-space: nowrap;
+}
+.stamp.press { animation: press .38s cubic-bezier(.2,.9,.3,1.3); }
+@keyframes press { from { transform: rotate(-4deg) scale(1.6); opacity: 0; } to { transform: rotate(-4deg) scale(1); opacity: .9; } }
+
+.meter { margin: 18px 0 6px; }
+.meter svg { display: block; width: 100%; height: 64px; overflow: visible; }
+.actions { display: flex; gap: 8px 10px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
+.btn {
+  border: 1px solid var(--rule); background: var(--sheet); padding: 7px 12px; border-radius: var(--r);
+  font-size: var(--t-s); font-weight: 500; cursor: pointer;
+}
+.btn:hover { border-color: var(--ink-3); }
+.btn.primary { background: var(--ink); color: var(--sheet); border-color: var(--ink); }
+.btn.primary:hover { background: var(--stamp); border-color: var(--stamp); }
+.btn[disabled] { opacity: .45; cursor: default; }
+.note { font-size: var(--t-s); color: var(--ink-2); min-height: 1.5em; margin: 10px 0 0; }
+
+.figs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin: 0; }
+@media (max-width: 560px) { .figs { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 14px; } }
+.figs div { padding: 0 14px; border-left: 1px solid var(--rule-soft); min-width: 0; }
+.figs div:first-child { padding-left: 0; border-left: 0; }
+@media (max-width: 560px) { .figs div:nth-child(3) { padding-left: 0; border-left: 0; } }
+.figs dt { font-size: var(--t-xs); color: var(--ink-2); }
+.figs dd { margin: 2px 0 0; font-size: var(--t-l); font-weight: 600; }
+.figs small { display: block; font-size: var(--t-xs); color: var(--ink-3); font-weight: 400; }
+.figs small.up { color: var(--over); } .figs small.down { color: var(--under); }
+
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: auto; }
+.chart text { font-family: var(--f-ui); font-size: 11px; fill: var(--ink-3); }
+.legend { display: flex; gap: 6px 14px; flex-wrap: wrap; font-size: var(--t-xs); color: var(--ink-2); margin-top: 8px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.tip {
+  position: absolute; pointer-events: none; background: var(--ink); color: var(--sheet); font-size: var(--t-xs);
+  padding: 6px 8px; border-radius: var(--r); white-space: nowrap; transform: translate(-50%, -115%); z-index: 2;
+}
+
+.ask form { display: flex; gap: 8px; }
+.ask input { flex: 1; min-width: 0; padding: 8px 10px; border: 1px solid var(--rule); border-radius: var(--r); background: var(--sheet); }
+.ask .out { margin-top: 12px; font-size: var(--t-s); white-space: pre-wrap; }
+.ask .trace { margin-top: 6px; font-size: var(--t-xs); color: var(--ink-3); }
+.ask .ex { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.ask .ex button { border: 1px dashed var(--rule); background: none; border-radius: 999px; font-size: var(--t-xs); padding: 3px 10px; cursor: pointer; color: var(--ink-2); }
+
+/* ---------- Anlage 1 ---------- */
+.anlage { margin-top: 28px; }
+.anlage-head { display: flex; align-items: flex-end; gap: 10px 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.anlage-head h2 { font: 600 var(--t-xl)/1.2 var(--f-doc); margin: 0; }
+.anlage-head p { margin: 0; color: var(--ink-2); font-size: var(--t-s); }
+.anlage-head .tools { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.search, .filter { padding: 6px 10px; border: 1px solid var(--rule); border-radius: var(--r); background: var(--sheet); font-size: var(--t-s); }
+.search { width: 14rem; max-width: 100%; }
+.tablebox { overflow-x: auto; background: var(--sheet); border: 1px solid var(--rule-soft); }
+table { border-collapse: collapse; width: 100%; font-size: var(--t-s); }
+th, td { padding: 7px 12px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--rule-soft); }
+th:nth-child(-n+2), td:nth-child(-n+2), th:last-child, td:last-child { text-align: left; }
+thead th { position: sticky; top: 0; background: var(--sheet); font-weight: 500; color: var(--ink-2); border-bottom: 1px solid var(--rule); }
+thead button { all: unset; cursor: pointer; }
+thead button:focus-visible { outline: 2px solid var(--stamp); }
+thead [aria-sort="ascending"] button::after { content: " ▲"; font-size: .7em; }
+thead [aria-sort="descending"] button::after { content: " ▼"; font-size: .7em; }
+tbody tr:hover { background: var(--field); }
+td.amt { font-weight: 600; color: var(--ink); }
+td.id { color: var(--ink-3); }
+tr.ne td { color: var(--ink-3); }
+.lim { font-size: var(--t-xs); padding: 1px 7px; border-radius: 999px; border: 1px solid currentColor; }
+.lim.floor { color: var(--ochre); } .lim.cap { color: var(--stamp); } .lim.retirement { color: var(--plum); }
+.lim.not_eligible { color: var(--ink-3); border-style: dashed; }
+tfoot td { font-weight: 600; border-bottom: 0; border-top: 1px solid var(--rule); }
+.empty { padding: 28px; text-align: center; color: var(--ink-2); }
+
+footer { border-top: 1px solid var(--rule); color: var(--ink-3); font-size: var(--t-xs); }
+footer .wrap { padding-block: 16px 28px; display: flex; gap: 8px 24px; flex-wrap: wrap; }
+footer p { margin: 0; max-width: 70ch; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="wrap">
+    <div class="mark"><b>Plan<span>werk</span></b><span class="case" id="caseTitle"></span></div>
+    <span class="chip" id="dataChip"><i></i><span></span></span>
+    <div class="lang" role="group" aria-label="Sprache / Language">
+      <button type="button" data-lang="de" aria-pressed="true">DE</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid">
+    <article class="sheet" id="doc" aria-label="Sozialplan"></article>
+
+    <section class="calc" aria-live="polite">
+      <div class="panel">
+        <div class="costhead"><h3 id="tCost"></h3><div class="stamp" id="stamp" hidden></div></div>
+        <div class="cost">
+          <div class="total" id="total">–</div>
+          <div class="delta" id="delta"></div>
+        </div>
+        <div class="meter" id="meter"></div>
+        <div class="actions">
+          <button class="btn primary" type="button" id="fitBtn"></button>
+          <button class="btn" type="button" id="pinBtn"></button>
+        </div>
+        <p class="note" id="note"></p>
+      </div>
+
+      <div class="panel"><dl class="figs" id="figs"></dl></div>
+
+      <div class="panel">
+        <h3 id="tChart"></h3>
+        <div class="chart" id="chart"></div>
+        <div class="legend" id="legend"></div>
+      </div>
+
+      <div class="panel ask" id="askPanel" hidden>
+        <h3 id="tAsk"></h3>
+        <form id="askForm">
+          <label class="sr" for="askInput" id="tAskLabel"></label>
+          <input id="askInput" autocomplete="off">
+          <button class="btn primary" type="submit" id="askBtn"></button>
+        </form>
+        <div class="ex" id="askEx"></div>
+        <div class="out" id="askOut"></div>
+        <div class="trace" id="askTrace"></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="anlage" aria-labelledby="tAnlage">
+    <div class="anlage-head">
+      <div>
+        <h2 id="tAnlage"></h2>
+        <p id="anlageSub"></p>
+      </div>
+      <div class="tools">
+        <label class="sr" for="search" id="tSearchLabel"></label>
+        <input class="search" id="search" type="search">
+        <label class="sr" for="filter" id="tFilterLabel"></label>
+        <select class="filter" id="filter"></select>
+        <button class="btn" type="button" id="importBtn"></button>
+        <input type="file" id="file" accept=".csv,.xlsx,.xlsm,.txt" hidden>
+        <button class="btn" type="button" id="copyBtn"></button>
+        <button class="btn" type="button" id="xlsxBtn" hidden></button>
+      </div>
+    </div>
+    <div class="tablebox"><table id="table"></table></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p id="tFoot"></p>
+    <p id="build"></p>
+  </div>
+</footer>
+
+<script src="engine.js"></script>
+<script>
+(function () {
+"use strict";
+const P = window.Planwerk;
+
+/* ------------------------------------------------------------------ text */
+const T = {
+  de: {
+    locale: "de-DE",
+    doc: "Sozialplan",
+    parties: (c) => "zur Betriebsänderung bei der " + c,
+    s1h: "Geltungsbereich",
+    s1: (f) => `Dieser Sozialplan gilt für alle Beschäftigten, deren Arbeitsverhältnis infolge der Betriebsänderung endet und die am Stichtag ${f("stichtag")} dem Betrieb seit mindestens ${f("min_tenure_months")} Monaten angehören.`,
+    s2h: "Abfindung",
+    s2a: (f) => `Die Abfindung wird nach der ${f("formula")} berechnet:`,
+    fFactor: (f) => `Betriebszugehörigkeit <span class="op">×</span> Bruttomonatsgehalt <span class="op">×</span> ${f("factor")}`,
+    fDivisor: (f) => `Lebensalter <span class="op">×</span> Betriebszugehörigkeit <span class="op">×</span> Bruttomonatsgehalt <span class="op">÷</span> ${f("divisor")}`,
+    s2b: (f) => `Die Betriebszugehörigkeit zählt ${f("tenure_rounding")}.`,
+    formula: { factor: "Standardformel", divisor: "Divisorformel" },
+    tenure: { half_up: "in vollen Jahren, ab sechs Monaten aufgerundet", full_years: "in vollen Jahren, Restmonate entfallen", months: "monatsgenau" },
+    s3h: "Mindest- und Höchstbetrag",
+    s3: (f) => `Der Betrag nach § 2 beträgt mindestens ${f("floor_amount")} € und höchstens ${f("cap_amount")} €. Der Wert 0 bedeutet keine Grenze.`,
+    s4h: "Rentennahe Jahrgänge",
+    s4: (f) => `Wer am Stichtag das ${f("retirement_age")}. Lebensjahr vollendet hat, erhält höchstens ${f("retirement_cap_months")} Bruttomonatsgehälter.`,
+    s5h: "Zuschläge",
+    s5: (f) => `Zusätzlich werden ${f("child_bonus")} € je unterhaltsberechtigtem Kind und ${f("disability_bonus")} € bei anerkannter Schwerbehinderung gezahlt. Zuschläge fallen nicht unter den Höchstbetrag.`,
+    s6h: "Sozialplanvolumen",
+    s6a: (f) => `Das Gesamtvolumen beträgt ${f("budget")} €.`,
+    s6b: (f) => `${f("budget_mode")} Übersteigen die Ansprüche das Volumen, werden alle Beträge im gleichen Verhältnis gekürzt und abgerundet.`,
+    s7h: "Rundung",
+    s7: (f) => `Jeder Betrag wird auf ${f("rounding_step")} gerundet.`,
+    steps: { 1: "volle Euro", 10: "volle 10 Euro", 100: "volle 100 Euro" },
+    hint: "Die blau unterlegten Werte sind Eingabefelder. Jede Änderung rechnet sofort neu.",
+    cost: "Kosten des Sozialplans",
+    over: (d, b) => `${d} über dem Volumen von ${b}`,
+    under: (d, b) => `${d} unter dem Volumen von ${b}`,
+    noBudget: "Kein Volumen vereinbart",
+    stamp: "IM VOLUMEN",
+    budgetLbl: "Volumen",
+    pinnedLbl: "Gemerkt",
+    fitFactor: "Faktor an Volumen anpassen",
+    fitDivisor: "Divisor an Volumen anpassen",
+    pin: "Szenario merken",
+    unpin: "Vergleich beenden",
+    fitted: (p, v, t) => `${p} auf ${v} gesetzt. Neue Summe ${t}.`,
+    noFit: "Erst ein Volumen in § 6 eintragen.",
+    pinned: "Gemerkt. Änderungen werden jetzt mit diesem Stand verglichen.",
+    factorName: "Faktor", divisorName: "Divisor",
+    figs: { eligible: "Anspruchsberechtigt", median: "Median", months: "Monatsgehälter im Schnitt", range: "Spanne", quota: "Kürzungsquote", of: "von" },
+    chart: "Abfindung nach Betriebszugehörigkeit",
+    axisX: "Jahre im Betrieb", cap: "Höchstbetrag", floorL: "Sockel",
+    legend: { "": "nach Formel", floor: "Sockelbetrag", cap: "Höchstbetrag", retirement: "rentennah", not_eligible: "kein Anspruch" },
+    ask: "Fragen an den Plan", askBtn: "Fragen", askPh: "Was kostet ein Höchstbetrag von 180.000 €?",
+    askLabel: "Frage an den Assistenten",
+    askEx: ["Wie ändert sich die Summe ohne Sockelbetrag?", "Vergleiche Faktor 0,6 und Divisor 75.", "Welcher Faktor passt zu 6 Mio. €?"],
+    asking: "Rechne …", askFail: "Der Assistent ist gerade nicht erreichbar.",
+    anlage: "Anlage 1", sub: (n, s) => `Abfindungsliste, ${n} Personen, sortiert nach ${s}`,
+    search: "Name oder Nr. suchen", searchLabel: "Suche",
+    filter: { all: "Alle", cap: "Gedeckelt", floor: "Sockelbetrag", retirement: "Rentennah", not_eligible: "Ohne Anspruch" },
+    filterLabel: "Filter",
+    import: "Liste importieren", copy: "Tabelle kopieren", copied: "Kopiert. In Excel einfügen.", xlsx: "Excel-Modell",
+    cols: { id: "Nr.", name: "Name", age: "Alter", tenure_years: "BZ (J.)", monthly_gross: "Brutto/Monat", base: "Grundbetrag", bonus: "Zuschläge", amount: "Abfindung", points: "Punkte", limit: "Hinweis" },
+    sum: "Summe", none: "Keine Treffer für diese Suche.",
+    synthetic: "Synthetische Daten", own: "Eigene Daten, nur in diesem Browser",
+    imported: (n) => `${n} Personen importiert. Die Daten bleiben in diesem Browser.`,
+    importErr: (m) => `Import nicht möglich: ${m}`,
+    missing: (f) => `Pflichtspalten fehlen: ${f}. Erwartet werden u. a. Geburtsdatum, Eintritt und Brutto.`,
+    foot: "Rechenhilfe, keine Rechtsberatung. Engine in Python und JavaScript, Excel-Export mit Live-Formeln; alle drei werden in der Test-Suite gegeneinander geprüft.",
+    sortBy: { amount: "Abfindung", points: "Punkten", id: "Nr.", name: "Name", age: "Alter", tenure_years: "Betriebszugehörigkeit", monthly_gross: "Gehalt", base: "Grundbetrag", bonus: "Zuschlägen", limit: "Hinweis" },
+  },
+  en: {
+    locale: "en-GB",
+    doc: "Social plan",
+    parties: (c) => "for the restructuring at " + c,
+    s1h: "Scope",
+    s1: (f) => `This social plan applies to all employees whose employment ends as a result of the restructuring and who, on the reference date ${f("stichtag")}, have been with the company for at least ${f("min_tenure_months")} months.`,
+    s2h: "Severance",
+    s2a: (f) => `Severance is calculated with the ${f("formula")}:`,
+    fFactor: (f) => `Years of service <span class="op">×</span> monthly gross salary <span class="op">×</span> ${f("factor")}`,
+    fDivisor: (f) => `Age <span class="op">×</span> years of service <span class="op">×</span> monthly gross salary <span class="op">÷</span> ${f("divisor")}`,
+    s2b: (f) => `Years of service are counted ${f("tenure_rounding")}.`,
+    formula: { factor: "standard formula", divisor: "divisor formula" },
+    tenure: { half_up: "in full years, rounded up from six months", full_years: "in full years, remaining months dropped", months: "to the month" },
+    s3h: "Minimum and maximum",
+    s3: (f) => `The amount under § 2 is at least € ${f("floor_amount")} and at most € ${f("cap_amount")}. A value of 0 means no limit.`,
+    s4h: "Close to retirement",
+    s4: (f) => `Anyone who has reached the age of ${f("retirement_age")} on the reference date receives at most ${f("retirement_cap_months")} monthly salaries.`,
+    s5h: "Supplements",
+    s5: (f) => `In addition, € ${f("child_bonus")} is paid per dependent child and € ${f("disability_bonus")} for a recognised severe disability. Supplements are not subject to the maximum.`,
+    s6h: "Total volume",
+    s6a: (f) => `The total volume is € ${f("budget")}.`,
+    s6b: (f) => `${f("budget_mode")} If claims exceed the volume, all amounts are reduced in the same proportion and rounded down.`,
+    s7h: "Rounding",
+    s7: (f) => `Each amount is rounded to ${f("rounding_step")}.`,
+    steps: { 1: "full euros", 10: "full 10 euros", 100: "full 100 euros" },
+    hint: "Values highlighted in blue are input fields. Every change recalculates immediately.",
+    cost: "Cost of the social plan",
+    over: (d, b) => `${d} over the volume of ${b}`,
+    under: (d, b) => `${d} under the volume of ${b}`,
+    noBudget: "No total volume agreed",
+    stamp: "WITHIN VOLUME",
+    budgetLbl: "Volume",
+    pinnedLbl: "Saved",
+    fitFactor: "Fit factor to volume",
+    fitDivisor: "Fit divisor to volume",
+    pin: "Save scenario",
+    unpin: "End comparison",
+    fitted: (p, v, t) => `${p} set to ${v}. New total ${t}.`,
+    noFit: "Enter a total volume in § 6 first.",
+    pinned: "Saved. Changes are now compared with this version.",
+    factorName: "Factor", divisorName: "Divisor",
+    figs: { eligible: "Eligible", median: "Median", months: "Monthly salaries on average", range: "Range", quota: "Reduction quota", of: "of" },
+    chart: "Severance by years of service",
+    axisX: "Years of service", cap: "Maximum", floorL: "Minimum",
+    legend: { "": "by formula", floor: "minimum", cap: "maximum", retirement: "near retirement", not_eligible: "no claim" },
+    ask: "Ask the plan", askBtn: "Ask", askPh: "What does a € 180,000 cap cost?",
+    askLabel: "Question for the assistant",
+    askEx: ["How does the total change without a minimum?", "Compare factor 0.6 with divisor 75.", "Which factor fits € 6m?"],
+    asking: "Calculating …", askFail: "The assistant is not reachable right now.",
+    anlage: "Annex 1", sub: (n, s) => `Severance list, ${n} people, sorted by ${s}`,
+    search: "Search name or no.", searchLabel: "Search",
+    filter: { all: "All", cap: "Capped", floor: "Minimum", retirement: "Near retirement", not_eligible: "No claim" },
+    filterLabel: "Filter",
+    import: "Import list", copy: "Copy table", copied: "Copied. Paste into Excel.", xlsx: "Excel model",
+    cols: { id: "No.", name: "Name", age: "Age", tenure_years: "Service (yrs)", monthly_gross: "Gross/month", base: "Base amount", bonus: "Supplements", amount: "Severance", points: "Points", limit: "Note" },
+    sum: "Total", none: "No matches for this search.",
+    synthetic: "Synthetic data", own: "Your data, only in this browser",
+    imported: (n) => `${n} people imported. The data stays in this browser.`,
+    importErr: (m) => `Import failed: ${m}`,
+    missing: (f) => `Required columns missing: ${f}. Expected e.g. date of birth, entry date and gross salary.`,
+    foot: "Calculation aid, not legal advice. Engine in Python and JavaScript, Excel export with live formulas; the test suite checks all three against each other.",
+    sortBy: { amount: "severance", points: "points", id: "no.", name: "name", age: "age", tenure_years: "service", monthly_gross: "salary", base: "base amount", bonus: "supplements", limit: "note" },
+  },
+};
+
+/* ----------------------------------------------------------------- state */
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem("planwerk." + k)); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem("planwerk." + k, JSON.stringify(v)); } catch (e) { /* storage off */ } },
+};
+
+const state = {
+  lang: store.get("lang") || ((navigator.language || "de").startsWith("de") ? "de" : "en"),
+  kase: null,
+  scheme: null,
+  pinned: null,
+  sort: { key: "amount", dir: -1 },
+  q: "",
+  filter: "all",
+  server: { available: false, assistant: false },
+  result: null,
+};
+const t = () => T[state.lang];
+const $ = (id) => document.getElementById(id);
+
+/* ------------------------------------------------------------ formatting */
+const nf = (d) => new Intl.NumberFormat(t().locale, { minimumFractionDigits: d, maximumFractionDigits: d });
+const eur = (x) => state.lang === "de" ? nf(0).format(x) + " €" : "€ " + nf(0).format(x);
+const eurShort = (x) => {
+  if (Math.abs(x) >= 1e6) return (state.lang === "de" ? nf(2).format(x / 1e6) + " Mio. €" : "€ " + nf(2).format(x / 1e6) + "m");
+  return eur(x);
+};
+const num = (x, d) => nf(d).format(x);
+const rangeText = (a, b) => state.lang === "de"
+  ? `${nf(0).format(a / 1000)}–${nf(0).format(b / 1000)} Tsd. €` : `€${nf(0).format(a / 1000)}k–${nf(0).format(b / 1000)}k`;
+function parseNum(s) {
+  s = String(s).replace(/[\s€]/g, "");
+  if (state.lang === "de") s = s.replace(/\./g, "").replace(",", ".");
+  else s = s.replace(/,/g, "");
+  if (s === "" || !/^-?\d*\.?\d+$/.test(s)) return NaN;
+  return Number(s);
+}
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+/* --------------------------------------------------------- the document */
+const FIELDS = {
+  factor: { kind: "num", dec: 3 }, divisor: { kind: "num", dec: 1 },
+  min_tenure_months: { kind: "num", dec: 0 }, floor_amount: { kind: "num", dec: 0 },
+  cap_amount: { kind: "num", dec: 0 }, retirement_age: { kind: "num", dec: 0 },
+  retirement_cap_months: { kind: "num", dec: 1 }, child_bonus: { kind: "num", dec: 0 },
+  disability_bonus: { kind: "num", dec: 0 }, budget: { kind: "num", dec: 0 },
+  stichtag: { kind: "date" }, formula: { kind: "select" }, tenure_rounding: { kind: "select" },
+  rounding_step: { kind: "select" }, budget_mode: { kind: "tick" },
+};
+
+function fieldHtml(name) {
+  const s = state.scheme, def = FIELDS[name], L = t();
+  if (def.kind === "num") {
+    const v = num(s[name], def.dec);
+    return `<input class="f" data-field="${name}" id="f-${name}" inputmode="decimal" autocomplete="off" value="${v}" style="width:${v.length + 1.6}ch" aria-label="${name}">`;
+  }
+  if (def.kind === "date") return `<input class="f" type="date" data-field="stichtag" id="f-stichtag" value="${s.stichtag}" aria-label="Stichtag">`;
+  if (def.kind === "tick") {
+    return `<label class="tick"><input type="checkbox" data-field="budget_mode" id="f-budget_mode" ${s.budget_mode === "pro_rata" ? "checked" : ""}><span class="sr">pro rata</span></label>`;
+  }
+  const opts = name === "formula" ? L.formula : name === "tenure_rounding" ? L.tenure : L.steps;
+  return `<select class="f" data-field="${name}" id="f-${name}" aria-label="${name}">` +
+    Object.entries(opts).map(([k, label]) => `<option value="${k}" ${String(s[name]) === String(k) ? "selected" : ""}>${esc(label)}</option>`).join("") +
+    `</select>`;
+}
+
+function renderDoc() {
+  const L = t(), f = fieldHtml, focus = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.field : null;
+  const para = (n, h, body) => `<section class="para"><h2><span class="sec">§ ${n}</span>${h}</h2>${body}</section>`;
+  const p = (abs, html) => `<p>${abs ? `<span class="abs">(${abs})</span>` : ""}${html}</p>`;
+  $("doc").innerHTML =
+    `<h1>${L.doc}</h1><p class="parties">${esc(L.parties(companyName()))}</p>` +
+    para(1, L.s1h, p(0, L.s1(f))) +
+    para(2, L.s2h, p(1, L.s2a(f)) + `<div class="formula">${state.scheme.formula === "factor" ? L.fFactor(f) : L.fDivisor(f)}</div>` + p(2, L.s2b(f))) +
+    para(3, L.s3h, p(0, L.s3(f))) +
+    para(4, L.s4h, p(0, L.s4(f))) +
+    para(5, L.s5h, p(0, L.s5(f))) +
+    para(6, L.s6h, p(1, L.s6a(f)) + p(2, L.s6b(f))) +
+    para(7, L.s7h, p(0, L.s7(f))) +
+    `<p class="hint">${L.hint}</p>`;
+  if (focus) { const el = $("f-" + focus); if (el) el.focus(); }
+}
+
+function companyName() {
+  return (state.kase.title || "").replace(/\s*\((synthetisch|synthetic)\)\s*$/i, "");
+}
+
+function onDocInput(ev) {
+  const el = ev.target, name = el.dataset.field;
+  if (!name) return;
+  const def = FIELDS[name];
+  let v;
+  if (def.kind === "num") {
+    v = parseNum(el.value);
+    const bad = !isFinite(v) || v < 0 || (name === "divisor" && v === 0);
+    el.setAttribute("aria-invalid", bad ? "true" : "false");
+    el.style.width = (el.value.length + 1.6) + "ch";
+    if (bad) return;
+  } else if (def.kind === "tick") v = el.checked ? "pro_rata" : "none";
+  else if (def.kind === "date") { if (!el.value) return; v = el.value; }
+  else v = name === "rounding_step" ? Number(el.value) : el.value;
+  state.scheme[name] = v;
+  store.set("scheme", state.scheme);
+  if (name === "formula") { renderDoc(); updateFitLabel(); }
+  recalc();
+}
+
+function onDocBlur(ev) {
+  const el = ev.target, name = el.dataset && el.dataset.field;
+  if (!name || FIELDS[name].kind !== "num") return;
+  if (el.getAttribute("aria-invalid") === "true") return;
+  el.value = num(state.scheme[name], FIELDS[name].dec);
+  el.style.width = (el.value.length + 1.6) + "ch";
+}
+
+function setField(name, value) {
+  state.scheme[name] = value;
+  store.set("scheme", state.scheme);
+  const el = $("f-" + name);
+  if (el) {
+    el.value = num(value, FIELDS[name].dec);
+    el.style.width = (el.value.length + 1.6) + "ch";
+    el.classList.add("flash");
+    setTimeout(() => el.classList.remove("flash"), 650);
+  }
+}
+
+/* ------------------------------------------------------------ calculate */
+let lastWithin = null;
+function recalc() {
+  state.result = P.calculate(state.kase.employees, state.scheme);
+  renderCost();
+  renderFigs();
+  renderChart();
+  renderTable();
+}
+
+function renderCost() {
+  const L = t(), r = state.result, s = state.scheme, total = r.total;
+  $("tCost").textContent = L.cost;
+  $("total").textContent = eur(total);
+  const d = $("delta"), stamp = $("stamp");
+  d.className = "delta";
+  let within = null;
+  if (s.budget > 0) {
+    const diff = s.budget - total;
+    within = diff >= 0;
+    d.classList.add(within ? "under" : "over");
+    d.textContent = within ? L.under(eur(diff), eur(s.budget)) : L.over(eur(-diff), eur(s.budget));
+    if (r.quota < 1) d.textContent += (state.lang === "de" ? "; Kürzungsquote " : "; reduction quota ") + num(r.quota * 100, 2) + " %";
+  } else d.textContent = L.noBudget;
+  stamp.textContent = L.stamp;
+  stamp.hidden = !within;
+  if (within && lastWithin === false) { stamp.classList.remove("press"); void stamp.offsetWidth; stamp.classList.add("press"); }
+  lastWithin = within;
+  renderMeter();
+}
+
+function renderMeter() {
+  const L = t(), s = state.scheme, total = state.result.total, ref = state.pinned ? state.pinned.total : null;
+  const max = Math.max(total, s.budget || 0, ref || 0) * 1.06 || 1;
+  const W = 1000, x = (v) => (v / max) * W;
+  const within = s.budget > 0 ? Math.min(total, s.budget) : total;
+  const over = s.budget > 0 && total > s.budget;
+  let svg = `<svg viewBox="0 0 ${W} 64" preserveAspectRatio="none" role="img" aria-label="${esc(L.cost)}">
+    <defs><pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="8" height="8" fill="var(--over-soft)"/><rect width="3" height="8" fill="var(--over)"/></pattern></defs>
+    <rect x="0" y="26" width="${W}" height="22" fill="var(--rule-soft)"/>
+    <rect x="0" y="26" width="${x(within)}" height="22" fill="var(--ink)"/>`;
+  if (over) svg += `<rect x="${x(s.budget)}" y="26" width="${x(total) - x(s.budget)}" height="22" fill="url(#hatch)"/>`;
+  svg += `</svg>`;
+  // Labels live in HTML so they do not stretch with the bar.
+  const pct = (v) => Math.min(100, (v / max) * 100);
+  let marks = "";
+  if (s.budget > 0) marks += `<div style="position:absolute;left:${pct(s.budget)}%;top:14px;bottom:10px;border-left:2px solid var(--stamp)"></div>
+    <div style="position:absolute;left:${pct(s.budget)}%;top:-6px;transform:translateX(${pct(s.budget) > 70 ? "-100%" : "0"});font-size:var(--t-xs);color:var(--stamp);white-space:nowrap;padding:0 6px">${L.budgetLbl} ${eurShort(s.budget)}</div>`;
+  if (ref !== null) marks += `<div style="position:absolute;left:${pct(ref)}%;top:22px;height:30px;border-left:2px dashed var(--ink-2)"></div>
+    <div style="position:absolute;left:${pct(ref)}%;top:52px;transform:translateX(${pct(ref) > 70 ? "-100%" : "0"});font-size:var(--t-xs);color:var(--ink-2);white-space:nowrap;padding:0 6px">${L.pinnedLbl} ${eurShort(ref)}</div>`;
+  $("meter").innerHTML = `<div style="position:relative;height:${ref !== null ? 76 : 64}px">${svg}${marks}</div>`;
+}
+
+function updateFitLabel() {
+  const L = t();
+  $("fitBtn").textContent = state.scheme.formula === "factor" ? L.fitFactor : L.fitDivisor;
+  $("pinBtn").textContent = state.pinned ? L.unpin : L.pin;
+}
+
+function fit() {
+  const L = t(), s = state.scheme;
+  if (!(s.budget > 0)) { $("note").textContent = L.noFit; $("f-budget").focus(); return; }
+  const res = P.fitBudget(state.kase.employees, s, s.budget);
+  if (!res.feasible) { $("note").textContent = res.note; return; }
+  const name = res.parameter;
+  if (s.budget_mode === "pro_rata") { state.scheme.budget_mode = "none"; renderDoc(); }
+  setField(name, res.value);
+  recalc();
+  $("note").textContent = L.fitted(name === "factor" ? L.factorName : L.divisorName, num(res.value, name === "factor" ? 3 : 1), eur(res.total));
+}
+
+function togglePin() {
+  const L = t();
+  if (state.pinned) { state.pinned = null; $("note").textContent = ""; }
+  else { state.pinned = { total: state.result.total, summary: state.result.summary }; $("note").textContent = L.pinned; }
+  updateFitLabel();
+  renderMeter();
+  renderFigs();
+}
+
+function renderFigs() {
+  const L = t(), sm = state.result.summary, ref = state.pinned && state.pinned.summary;
+  const delta = (cur, old, fmt) => {
+    if (!ref) return "";
+    const d = cur - old;
+    if (Math.abs(d) < 1e-9) return `<small>±0</small>`;
+    return `<small class="${d > 0 ? "up" : "down"}">${d > 0 ? "+" : "−"}${fmt(Math.abs(d))}</small>`;
+  };
+  const fourth = state.result.quota < 1
+    ? `<div><dt>${L.figs.quota}</dt><dd>${num(state.result.quota * 100, 2)} %</dd></div>`
+    : `<div><dt>${L.figs.range}</dt><dd>${rangeText(sm.min, sm.max)}</dd>${delta(sm.max, ref ? ref.max : 0, eur)}</div>`;
+  $("figs").innerHTML =
+    `<div><dt>${L.figs.eligible}</dt><dd>${sm.eligible} <span style="font-weight:400;color:var(--ink-3);font-size:var(--t-s)">${L.figs.of} ${sm.headcount}</span></dd>${delta(sm.eligible, ref ? ref.eligible : 0, (v) => String(v))}</div>` +
+    `<div><dt>${L.figs.median}</dt><dd>${eur(sm.median)}</dd>${delta(sm.median, ref ? ref.median : 0, eur)}</div>` +
+    `<div><dt>${L.figs.months}</dt><dd>${num(sm.months_equivalent, 1)}</dd>${delta(sm.months_equivalent, ref ? ref.months_equivalent : 0, (v) => num(v, 1))}</div>` +
+    fourth;
+}
+
+/* ---------------------------------------------------------------- chart */
+const LIMIT_COLOR = { "": "var(--ink-2)", floor: "var(--ochre)", cap: "var(--stamp)", retirement: "var(--plum)", not_eligible: "var(--ink-3)" };
+
+function renderChart() {
+  const L = t(), lines = state.result.lines, s = state.scheme;
+  $("tChart").textContent = L.chart;
+  const W = 640, H = 300, m = { l: 58, r: 14, t: 14, b: 40 };
+  const xMax = Math.max(5, Math.ceil(Math.max(...lines.map((l) => l.tenure_years)) / 5) * 5);
+  const yTop = Math.max(...lines.map((l) => l.amount), 1);
+  const step = niceStep(yTop / 4);
+  const yMax = Math.ceil(yTop / step) * step;
+  const X = (v) => m.l + (v / xMax) * (W - m.l - m.r);
+  const Y = (v) => H - m.b - (v / yMax) * (H - m.t - m.b);
+  let g = "";
+  for (let v = 0; v <= yMax + 1e-6; v += step) {
+    g += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--rule-soft)"/>`;
+    g += `<text x="${m.l - 8}" y="${Y(v) + 4}" text-anchor="end">${v >= 1000 ? num(v / 1000, 0) + (state.lang === "de" ? " Tsd." : "k") : num(v, 0)}</text>`;
+  }
+  for (let v = 0; v <= xMax; v += 5) g += `<text x="${X(v)}" y="${H - m.b + 18}" text-anchor="middle">${v}</text>`;
+  g += `<text x="${(m.l + W - m.r) / 2}" y="${H - 4}" text-anchor="middle">${L.axisX}</text>`;
+  g += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--rule)"/>`;
+  const refLine = (v, label, color) => (v > 0 && v <= yMax)
+    ? `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="${color}" stroke-dasharray="4 4" stroke-width="1.2"/><text x="${W - m.r}" y="${Y(v) - 5}" text-anchor="end" style="fill:${color}">${label}</text>` : "";
+  if (state.result.quota === 1) {
+    g += refLine(s.cap_amount, L.cap, "var(--stamp)");
+    g += refLine(s.floor_amount, L.floorL, "var(--ochre)");
+  }
+  let pts = "";
+  lines.forEach((l, i) => {
+    const c = LIMIT_COLOR[l.limit];
+    const hollow = l.limit === "not_eligible";
+    pts += `<circle data-i="${i}" cx="${X(l.tenure_years).toFixed(1)}" cy="${Y(l.amount).toFixed(1)}" r="4" fill="${hollow ? "var(--sheet)" : c}" fill-opacity="${hollow ? 1 : 0.78}" stroke="${c}" stroke-width="${hollow ? 1.3 : 0}"/>`;
+  });
+  $("chart").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(L.chart)}">${g}<g id="pts">${pts}</g></svg><div class="tip" id="tip" hidden></div>`;
+  $("legend").innerHTML = Object.entries(L.legend).map(([k, label]) =>
+    `<span><i class="dot" style="background:${k === "not_eligible" ? "transparent" : LIMIT_COLOR[k]};border:1.3px solid ${LIMIT_COLOR[k]}"></i>${label}</span>`).join("");
+}
+
+function niceStep(raw) {
+  const p = Math.pow(10, Math.floor(Math.log10(raw)));
+  const n = raw / p;
+  return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * p;
+}
+
+function onChartMove(ev) {
+  const c = ev.target.closest && ev.target.closest("circle");
+  const tip = $("tip");
+  if (!c || !tip) { if (tip) tip.hidden = true; return; }
+  const l = state.result.lines[Number(c.dataset.i)];
+  const box = $("chart").getBoundingClientRect(), cb = c.getBoundingClientRect();
+  tip.textContent = `${l.id}  ${l.name}  ${eur(l.amount)}`;
+  tip.style.left = (cb.left - box.left + cb.width / 2) + "px";
+  tip.style.top = (cb.top - box.top) + "px";
+  tip.hidden = false;
+}
+
+/* ---------------------------------------------------------------- table */
+const COLS = ["id", "name", "age", "tenure_years", "monthly_gross", "base", "bonus", "amount", "points", "limit"];
+
+function renderTable() {
+  const L = t(), q = state.q.trim().toLowerCase();
+  let rows = state.result.lines.filter((l) =>
+    (!q || l.name.toLowerCase().includes(q) || l.id.toLowerCase().includes(q)) &&
+    (state.filter === "all" || l.limit === state.filter));
+  const { key, dir } = state.sort;
+  rows = rows.slice().sort((a, b) => {
+    const va = a[key], vb = b[key];
+    const cmp = typeof va === "string" ? va.localeCompare(vb, t().locale) : va - vb;
+    return cmp * dir || a.id.localeCompare(b.id);
+  });
+  $("anlageSub").textContent = L.sub(state.result.lines.length, L.sortBy[key]);
+  const th = COLS.map((c) => {
+    const sort = state.sort.key === c ? (state.sort.dir > 0 ? "ascending" : "descending") : "none";
+    return `<th aria-sort="${sort}" scope="col"><button type="button" data-sort="${c}">${L.cols[c]}</button></th>`;
+  }).join("");
+  const tenureDec = state.scheme.tenure_rounding === "months" ? 2 : 0;
+  const body = rows.map((l) => `<tr class="${l.eligible ? "" : "ne"}">
+      <td class="id">${esc(l.id)}</td><td>${esc(l.name)}</td><td>${l.age}</td>
+      <td>${num(l.tenure_years, tenureDec)}</td><td>${eur(l.monthly_gross)}</td>
+      <td>${eur(l.base)}</td><td>${l.bonus ? eur(l.bonus) : "–"}</td>
+      <td class="amt">${eur(l.amount)}</td><td>${l.points}</td>
+      <td>${l.limit ? `<span class="lim ${l.limit}">${L.legend[l.limit]}</span>` : ""}</td></tr>`).join("");
+  const sum = rows.reduce((a, l) => a + l.amount, 0), bonus = rows.reduce((a, l) => a + l.bonus, 0);
+  $("table").innerHTML = `<thead><tr>${th}</tr></thead>` +
+    (rows.length ? `<tbody>${body}</tbody><tfoot><tr><td></td><td>${L.sum} (${rows.length})</td><td></td><td></td><td></td><td></td><td>${eur(bonus)}</td><td class="amt">${eur(sum)}</td><td></td><td></td></tr></tfoot>`
+      : `<tbody><tr><td colspan="10" class="empty">${L.none}</td></tr></tbody>`);
+}
+
+/* --------------------------------------------------------- import/export */
+const SYN = {
+  id: ["personalnummer", "personalnr", "persnr", "pnr", "id", "employeeid", "staffno", "nr"],
+  name: ["name", "mitarbeiter", "mitarbeiterin", "vornamename", "employee", "fullname", "nachnamevorname"],
+  birth_date: ["geburtsdatum", "gebdatum", "geboren", "birthdate", "dateofbirth", "dob", "gebam"],
+  entry_date: ["eintritt", "eintrittsdatum", "beschaeftigtseit", "betriebszugehoerigkeitab", "entrydate", "startdate", "hiredate", "seit"],
+  monthly_gross: ["brutto", "bruttomonatsgehalt", "monatsbrutto", "gehalt", "bruttogehalt", "monthlygross", "salary", "grosssalary", "bruttomonat"],
+  children: ["kinder", "unterhaltspflichtigekinder", "anzahlkinder", "children", "kids"],
+  married: ["verheiratet", "familienstand", "verh", "married", "ehe"],
+  disabled: ["schwerbehindert", "sb", "schwerbehinderung", "gdb50", "disabled", "disability"],
+};
+const normH = (s) => String(s).replace(/\(.*?\)/g, "").trim().toLowerCase()
+  .replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss")
+  .normalize("NFKD").replace(/[^a-z0-9]/g, "");
+const truthy = (v) => typeof v === "boolean" ? v : typeof v === "number" ? v !== 0 : ["1", "true", "ja", "yes", "x", "j", "y", "wahr"].includes(String(v).trim().toLowerCase());
+
+function toIsoDate(v) {
+  if (v instanceof Date) return v.toISOString().slice(0, 10);
+  if (typeof v === "number") { // Excel serial date
+    const d = new Date(Date.UTC(1899, 11, 30) + v * 86400000);
+    return d.toISOString().slice(0, 10);
+  }
+  const s = String(v).trim();
+  let m = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/);
+  if (m) { let y = Number(m[3]); if (y < 100) y += y > 30 ? 1900 : 2000; return `${y}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`; }
+  m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return m[0];
+  throw new Error("Datum " + s);
+}
+function toMoney(v) {
+  if (typeof v === "number") return v;
+  let s = String(v).replace(/[€\s]|EUR/g, "");
+  if (s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
+  const n = Number(s);
+  if (!isFinite(n)) throw new Error("Betrag " + v);
+  return n;
+}
+
+function rowsToEmployees(header, rows) {
+  const map = {};
+  header.forEach((h, i) => {
+    const k = normH(h);
+    const f = Object.keys(SYN).find((f) => SYN[f].includes(k) && !(f in map));
+    if (f) map[f] = i;
+  });
+  const missing = ["birth_date", "entry_date", "monthly_gross"].filter((f) => !(f in map));
+  if (missing.length) throw new Error(t().missing(missing.join(", ")));
+  const out = [];
+  rows.forEach((r, n) => {
+    if (!r || r.every((v) => v === null || v === undefined || String(v).trim() === "")) return;
+    const get = (f) => (f in map ? r[map[f]] : undefined);
+    if (["summe", "total"].includes(String(get("name") || "").trim().toLowerCase())) return;
+    const id = String(get("id") || "MA-" + String(n + 1).padStart(3, "0"));
+    out.push({
+      id, name: String(get("name") || id),
+      birth_date: toIsoDate(get("birth_date")), entry_date: toIsoDate(get("entry_date")),
+      monthly_gross: toMoney(get("monthly_gross")),
+      children: Number(get("children") || 0) || 0,
+      married: truthy(get("married") || false), disabled: truthy(get("disabled") || false),
+    });
+  });
+  return out;
+}
+
+function parseCsv(text) {
+  const first = text.split(/\r?\n/)[0];
+  const delim = [";", "\t", ","].map((d) => [d, first.split(d).length]).sort((a, b) => b[1] - a[1])[0][0];
+  const rows = [];
+  let row = [], cur = "", quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '"' && text[i + 1] === '"') { cur += '"'; i++; }
+      else if (c === '"') quoted = false;
+      else cur += c;
+    } else if (c === '"') quoted = true;
+    else if (c === delim) { row.push(cur); cur = ""; }
+    else if (c === "\n" || c === "\r") { if (c === "\r" && text[i + 1] === "\n") i++; row.push(cur); rows.push(row); row = []; cur = ""; }
+    else cur += c;
+  }
+  if (cur || row.length) { row.push(cur); rows.push(row); }
+  return rows;
+}
+
+function loadScript(src) {
+  return new Promise((res, rej) => {
+    if (window.XLSX) return res();
+    const s = document.createElement("script");
+    s.src = src; s.onload = res; s.onerror = () => rej(new Error("SheetJS"));
+    document.head.appendChild(s);
+  });
+}
+
+async function importFile(file) {
+  const L = t();
+  try {
+    let rows;
+    if (/\.(xlsx|xlsm)$/i.test(file.name)) {
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js");
+      const wb = window.XLSX.read(await file.arrayBuffer(), { type: "array" });
+      const ws = wb.Sheets["Anlage 1"] || wb.Sheets[wb.SheetNames[0]];
+      rows = window.XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null });
+    } else {
+      rows = parseCsv(await file.text());
+    }
+    const hi = rows.findIndex((r) => r.filter((v) => v !== null && String(v).trim() !== "").length >= 3);
+    const employees = rowsToEmployees(rows[hi].map((v) => v ?? ""), rows.slice(hi + 1));
+    if (!employees.length) throw new Error("0");
+    state.kase = { title: file.name.replace(/\.[^.]+$/, ""), employees, synthetic: false };
+    state.pinned = null;
+    renderChrome();
+    renderDoc();
+    recalc();
+    $("note").textContent = L.imported(employees.length);
+  } catch (e) {
+    $("note").textContent = L.importErr(e.message);
+  }
+}
+
+async function copyTable() {
+  const L = t(), cols = COLS;
+  const lines = [cols.map((c) => L.cols[c]).join("\t")].concat(
+    state.result.lines.map((l) => cols.map((c) => c === "limit" ? (l.limit ? L.legend[l.limit] : "") :
+      typeof l[c] === "number" ? String(l[c]).replace(".", state.lang === "de" ? "," : ".") : l[c]).join("\t")));
+  const text = lines.join("\n");
+  try { await navigator.clipboard.writeText(text); $("note").textContent = L.copied; }
+  catch (e) {
+    const ta = document.createElement("textarea");
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); $("note").textContent = L.copied; } catch (e2) { /* nothing more to try */ }
+    ta.remove();
+  }
+}
+
+async function exportXlsx() {
+  const body = { title: state.kase.title, scheme: state.scheme, employees: state.kase.synthetic ? null : state.kase.employees };
+  const r = await fetch("api/export.xlsx", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  if (!r.ok) { $("note").textContent = t().importErr(r.status); return; }
+  const url = URL.createObjectURL(await r.blob());
+  const a = document.createElement("a");
+  a.href = url; a.download = "Sozialplan_Anlage1.xlsx"; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+/* ------------------------------------------------------------ assistant */
+async function ask(question) {
+  const L = t();
+  if (!question.trim()) return;
+  $("askOut").textContent = L.asking;
+  $("askTrace").textContent = "";
+  try {
+    const r = await fetch("api/ask", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question, scheme: state.scheme, title: state.kase.title,
+        employees: state.kase.synthetic ? null : state.kase.employees }) });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.detail || r.status);
+    $("askOut").textContent = j.answer;
+    $("askTrace").textContent = j.tools && j.tools.length
+      ? "Engine: " + j.tools.map((x) => x.tool + "(" + JSON.stringify(x.input.changes || x.input.budget || x.input.scenarios || "") + ")").join(", ")
+      : "";
+  } catch (e) {
+    $("askOut").textContent = L.askFail + " " + e.message;
+  }
+}
+
+/* --------------------------------------------------------------- chrome */
+function renderChrome() {
+  const L = t();
+  document.documentElement.lang = state.lang;
+  document.querySelectorAll(".lang button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === state.lang)));
+  $("caseTitle").textContent = companyName();
+  const chip = $("dataChip");
+  chip.classList.toggle("own", !state.kase.synthetic);
+  chip.querySelector("span").textContent = state.kase.synthetic ? L.synthetic : L.own;
+  $("tAnlage").textContent = L.anlage;
+  $("search").placeholder = L.search;
+  $("tSearchLabel").textContent = L.searchLabel;
+  $("tFilterLabel").textContent = L.filterLabel;
+  $("filter").innerHTML = Object.entries(L.filter).map(([k, v]) => `<option value="${k}" ${state.filter === k ? "selected" : ""}>${v}</option>`).join("");
+  $("importBtn").textContent = L.import;
+  $("copyBtn").textContent = L.copy;
+  $("xlsxBtn").textContent = L.xlsx;
+  $("xlsxBtn").hidden = !state.server.available;
+  $("tAsk").textContent = L.ask;
+  $("askBtn").textContent = L.askBtn;
+  $("askInput").placeholder = L.askPh;
+  $("tAskLabel").textContent = L.askLabel;
+  $("askEx").innerHTML = L.askEx.map((q) => `<button type="button">${esc(q)}</button>`).join("");
+  $("askPanel").hidden = !state.server.assistant;
+  $("tFoot").textContent = L.foot;
+  updateFitLabel();
+}
+
+async function detectServer() {
+  try {
+    const r = await fetch("api/health", { cache: "no-store" });
+    if (!r.ok) return;
+    const j = await r.json();
+    state.server = { available: true, assistant: !!j.assistant };
+    $("build").textContent = `v${j.version} (${j.commit})`;
+    renderChrome();
+  } catch (e) { /* static hosting: browser-only mode */ }
+}
+
+async function loadSample() {
+  for (const url of ["sample_case.json", "api/sample"]) {
+    try {
+      const r = await fetch(url);
+      if (r.ok) return await r.json();
+    } catch (e) { /* try next */ }
+  }
+  throw new Error("sample_case.json not found");
+}
+
+async function boot() {
+  const kase = await loadSample();
+  state.kase = { title: kase.title, employees: kase.employees, synthetic: kase.synthetic };
+  state.scheme = Object.assign({}, P.DEFAULT_SCHEME, kase.scheme, store.get("scheme") || {});
+
+  renderChrome();
+  renderDoc();
+  recalc();
+
+  $("doc").addEventListener("input", onDocInput);
+  $("doc").addEventListener("change", onDocInput);
+  $("doc").addEventListener("focusout", onDocBlur);
+  $("doc").addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target.dataset.field) e.target.blur(); });
+  $("fitBtn").addEventListener("click", fit);
+  $("pinBtn").addEventListener("click", togglePin);
+  $("chart").addEventListener("mousemove", onChartMove);
+  $("chart").addEventListener("mouseleave", () => { const tip = $("tip"); if (tip) tip.hidden = true; });
+  $("search").addEventListener("input", (e) => { state.q = e.target.value; renderTable(); });
+  $("filter").addEventListener("change", (e) => { state.filter = e.target.value; renderTable(); });
+  $("table").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-sort]");
+    if (!b) return;
+    const k = b.dataset.sort;
+    state.sort = { key: k, dir: state.sort.key === k ? -state.sort.dir : (["id", "name", "limit"].includes(k) ? 1 : -1) };
+    renderTable();
+  });
+  $("importBtn").addEventListener("click", () => $("file").click());
+  $("file").addEventListener("change", (e) => { if (e.target.files[0]) importFile(e.target.files[0]); e.target.value = ""; });
+  $("copyBtn").addEventListener("click", copyTable);
+  $("xlsxBtn").addEventListener("click", exportXlsx);
+  $("askForm").addEventListener("submit", (e) => { e.preventDefault(); ask($("askInput").value); });
+  $("askEx").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { $("askInput").value = b.textContent; ask(b.textContent); } });
+  document.querySelectorAll(".lang button").forEach((b) => b.addEventListener("click", () => {
+    state.lang = b.dataset.lang; store.set("lang", state.lang);
+    renderChrome(); renderDoc(); recalc();
+  }));
+
+  detectServer();
+}
+
+boot().catch((e) => { $("doc").textContent = "Planwerk konnte nicht starten: " + e.message; });
+})();
+</script>
+</body>
+</html>

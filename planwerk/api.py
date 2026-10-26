@@ -81,6 +81,7 @@ def health() -> dict[str, Any]:
 
 
 @app.get("/api/sample")
+@app.get("/sample_case.json")
 def sample() -> JSONResponse:
     return JSONResponse(json.loads(SAMPLE.read_text(encoding="utf-8")))
 
