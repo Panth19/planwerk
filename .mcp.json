@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "planwerk": {
+      "command": "python3",
+      "args": ["-m", "planwerk.mcp_server"],
+      "env": { "PLANWERK_LOG_DIR": "logs" }
+    }
+  }
+}

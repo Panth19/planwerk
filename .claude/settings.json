@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(python -m pytest:*)",
+      "Bash(python3 -m pytest:*)",
+      "Bash(python scripts/*)",
+      "Bash(python3 scripts/*)",
+      "Bash(planwerk:*)",
+      "Bash(node tests/*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "mcp__planwerk__plan_summary",
+      "mcp__planwerk__simulate",
+      "mcp__planwerk__fit_budget",
+      "mcp__planwerk__compare",
+      "mcp__planwerk__social_ranking"
+    ],
+    "deny": [
+      "Read(~/planwerk-cases/**)",
+      "Read(./cases/**)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Bash(git push --force:*)",
+      "WebFetch"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(scripts/release.sh:*)",
+      "Bash(scripts/rollback.sh:*)",
+      "mcp__planwerk__set_scheme",
+      "mcp__planwerk__export_excel",
+      "mcp__planwerk__load_case"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [{ "type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard_data.py" }]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard_bash.py", "timeout": 300 }]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [{ "type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/after_edit.py", "timeout": 300 }]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [{ "type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/before_stop.py", "timeout": 600 }]
+      }
+    ]
+  }
+}
