@@ -30,7 +30,7 @@ from .privacy import assert_clean, llm_view
 server = MCPServer(
     name="planwerk",
     title="Planwerk Sozialplan-Rechner",
-    version="0.9.0",
+    version="1.0.0",
     instructions=(
         "Calculates German Sozialplan severance scenarios. Never compute amounts yourself: "
         "call simulate, fit_budget or compare. Results are aggregates; individual people are "
