@@ -31,17 +31,17 @@ class PrivacyViolation(RuntimeError):
 
 
 def llm_view(result: Result, level: Level = "aggregates") -> dict[str, Any]:
-    eligible = [l for l in result.lines if l.eligible]
+    eligible = [line for line in result.lines if line.eligible]
     bands = []
     for lo, hi in BANDS:
-        n = sum(1 for l in eligible if lo <= l.amount < hi)
+        n = sum(1 for line in eligible if lo <= line.amount < hi)
         label = f"{lo:,}–{hi:,} €".replace(",", ".") if hi < 10**12 else f"ab {lo:,} €".replace(",", ".")
         bands.append({"band": label, "count": n})
     by_age = {}
-    for lo, hi in [(18, 30), (30, 40), (40, 50), (50, 60), (60, 70)]:
-        group = [l.amount for l in eligible if lo <= l.age < hi]
-        by_age[f"{lo}–{hi - 1}"] = {"count": len(group),
-                                    "avg": round(sum(group) / len(group)) if group else 0}
+    for lo, hi in [(0, 30), (30, 40), (40, 50), (50, 60), (60, 200)]:
+        group = [line.amount for line in eligible if lo <= line.age < hi]
+        label = "unter 30" if lo == 0 else ("ab 60" if hi == 200 else f"{lo}–{hi - 1}")
+        by_age[label] = {"count": len(group), "avg": round(sum(group) / len(group)) if group else 0}
     view: dict[str, Any] = {
         "quota": round(result.quota, 6),
         "total_before_cut": round(result.total_gross),
@@ -51,9 +51,15 @@ def llm_view(result: Result, level: Level = "aggregates") -> dict[str, Any]:
     }
     if level == "pseudonymized":
         view["rows"] = [
-            {"id": l.id, "age": l.age, "tenure_years": l.tenure_years, "limit": l.limit,
-             "amount": l.amount, "points": l.points}
-            for l in result.lines
+            {
+                "id": line.id,
+                "age": line.age,
+                "tenure_years": line.tenure_years,
+                "limit": line.limit,
+                "amount": line.amount,
+                "points": line.points,
+            }
+            for line in result.lines
         ]
     return view
 

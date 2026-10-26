@@ -19,13 +19,13 @@ from typing import Any
 from mcp.server.mcpserver import MCPServer
 
 from . import audit
-from .engine import calculate, compare as compare_schemes, fit_budget as fit
+from .engine import calculate
+from .engine import compare as compare_schemes
+from .engine import fit_budget as fit
 from .excel import case_from_file, export_workbook
 from .model import Case
+from .paths import SAMPLE
 from .privacy import assert_clean, llm_view
-
-ROOT = Path(__file__).resolve().parents[1]
-SAMPLE = ROOT / "data" / "sample_case.json"
 
 server = MCPServer(
     name="planwerk",
@@ -61,8 +61,11 @@ def load_case(path: str) -> dict[str, Any]:
         case = case_from_file(p)
     _state["case"] = case
     audit.event("mcp.load_case", headcount=len(case.employees), synthetic=case.synthetic)
-    return {"title": case.title if case.synthetic else "Mandantenfall", "headcount": len(case.employees),
-            "scheme": case.scheme.to_json()}
+    return {
+        "title": case.title if case.synthetic else "Mandantenfall",
+        "headcount": len(case.employees),
+        "scheme": case.scheme.to_json(),
+    }
 
 
 @server.tool(description="Current scheme and result (aggregates, distribution, age groups).")
@@ -71,8 +74,10 @@ def plan_summary() -> dict[str, Any]:
     return _clean({"scheme": c.scheme.to_json(), "result": llm_view(calculate(c.employees, c.scheme))})
 
 
-@server.tool(description="Recalculate with changed scheme fields, e.g. {\"cap_amount\": 180000, \"factor\": 0.8}. "
-                         "Does not change the stored plan.")
+@server.tool(
+    description='Recalculate with changed scheme fields, e.g. {"cap_amount": 180000, "factor": 0.8}. '
+    "Does not change the stored plan."
+)
 def simulate(changes: dict[str, Any]) -> dict[str, Any]:
     c = _case()
     s = c.scheme.with_changes(**changes)
@@ -87,7 +92,7 @@ def fit_budget(budget: float, changes: dict[str, Any] | None = None) -> dict[str
         return fit(c.employees, c.scheme.with_changes(**(changes or {})), budget).to_json()
 
 
-@server.tool(description="Compare named scenarios side by side: {\"A\": {...changes}, \"B\": {...}}.")
+@server.tool(description='Compare named scenarios side by side: {"A": {...changes}, "B": {...}}.')
 def compare(scenarios: dict[str, dict[str, Any]]) -> dict[str, Any]:
     c = _case()
     res = compare_schemes(c.employees, {k: c.scheme.with_changes(**v) for k, v in scenarios.items()})
@@ -105,9 +110,13 @@ def set_scheme(changes: dict[str, Any]) -> dict[str, Any]:
 @server.tool(description="Sozialauswahl ranking by points, lowest first (Personal-Nr. and points only).")
 def social_ranking(limit: int = 20) -> list[dict[str, Any]]:
     c = _case()
-    lines = sorted(calculate(c.employees, c.scheme).lines, key=lambda l: (l.points, l.id))
-    return _clean([{"id": l.id, "points": l.points, "age": l.age, "tenure_years": int(l.tenure_months // 12)}
-                   for l in lines[:limit]])
+    lines = sorted(calculate(c.employees, c.scheme).lines, key=lambda line: (line.points, line.id))
+    return _clean(
+        [
+            {"id": line.id, "points": line.points, "age": line.age, "tenure_years": int(line.tenure_months // 12)}
+            for line in lines[:limit]
+        ]
+    )
 
 
 @server.tool(description="Write the current plan as a self-calculating Excel model and return the file path.")

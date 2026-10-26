@@ -13,9 +13,10 @@ import logging
 import os
 import sys
 import time
+from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 LOG_DIR = Path(os.environ.get("PLANWERK_LOG_DIR", "logs"))
 
@@ -69,8 +70,16 @@ def timed(name: str, **fields: Any) -> Iterator[dict[str, Any]]:
     try:
         yield extra
     except Exception as exc:
-        get_logger().error(name, extra={"fields": {**fields, **extra, "error": type(exc).__name__,
-                                                   "ms": round((time.perf_counter() - t0) * 1000, 1)}})
+        get_logger().error(
+            name,
+            extra={
+                "fields": {
+                    **fields,
+                    **extra,
+                    "error": type(exc).__name__,
+                    "ms": round((time.perf_counter() - t0) * 1000, 1),
+                }
+            },
+        )
         raise
-    get_logger().info(name, extra={"fields": {**fields, **extra,
-                                              "ms": round((time.perf_counter() - t0) * 1000, 1)}})
+    get_logger().info(name, extra={"fields": {**fields, **extra, "ms": round((time.perf_counter() - t0) * 1000, 1)}})

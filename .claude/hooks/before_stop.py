@@ -19,8 +19,14 @@ def main() -> None:
     event = json.load(sys.stdin)
     if event.get("stop_hook_active"):
         sys.exit(0)
-    r = subprocess.run([sys.executable, "-m", "pytest", "-q"], cwd=ROOT, capture_output=True, text=True,
-                       timeout=600, env={**os.environ, "PLANWERK_AUDIT_FILE": "0"})
+    r = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=600,
+        env={**os.environ, "PLANWERK_AUDIT_FILE": "0"},
+    )
     if r.returncode != 0:
         tail = "\n".join(r.stdout.strip().splitlines()[-20:])
         print(f"Not done yet, the test suite is red:\n{tail}", file=sys.stderr)

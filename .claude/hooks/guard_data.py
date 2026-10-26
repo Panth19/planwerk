@@ -23,8 +23,10 @@ PATTERNS = {
 
 
 def block(reason: str) -> None:
-    print(f"Blocked by guard_data: {reason}. Real case data lives outside the repo "
-          f"(~/planwerk-cases/), see SECURITY.md.", file=sys.stderr)
+    print(
+        f"Blocked by guard_data: {reason}. Real case data lives outside the repo (~/planwerk-cases/), see SECURITY.md.",
+        file=sys.stderr,
+    )
     sys.exit(2)
 
 

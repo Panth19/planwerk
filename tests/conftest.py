@@ -1,5 +1,9 @@
 import json
+import os
 from pathlib import Path
+
+# Tests never write an audit file into the working tree.
+os.environ.setdefault("PLANWERK_AUDIT_FILE", "0")
 
 import pytest
 

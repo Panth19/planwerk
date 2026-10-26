@@ -23,10 +23,11 @@ there and run ``pytest tests/test_js_parity.py``.
 from __future__ import annotations
 
 import math
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass
 from datetime import date
 from statistics import median
-from typing import Any, Iterable
+from typing import Any
 
 from .model import Employee, PointsScheme, Scheme
 
@@ -199,19 +200,17 @@ class Result:
             "total_gross": self.total_gross,
             "total": self.total,
             "summary": self.summary,
-            "lines": [l.to_json() for l in self.lines],
+            "lines": [line.to_json() for line in self.lines],
         }
 
 
-def calculate(
-    employees: Iterable[Employee], scheme: Scheme, points: PointsScheme | None = None
-) -> Result:
+def calculate(employees: Iterable[Employee], scheme: Scheme, points: PointsScheme | None = None) -> Result:
     points = points or PointsScheme()
     lines = [gross_line(e, scheme, points) for e in employees]
 
     total_gross = 0.0
-    for l in lines:
-        total_gross += l.gross
+    for line in lines:
+        total_gross += line.gross
 
     quota = 1.0
     cut = scheme.budget_mode == "pro_rata" and scheme.budget > 0 and total_gross > scheme.budget
@@ -219,25 +218,25 @@ def calculate(
         quota = scheme.budget / total_gross
 
     total = 0.0
-    for l in lines:
-        l.amount = round_step(l.gross * quota, scheme.rounding_step, down=cut)
-        total += l.amount
+    for line in lines:
+        line.amount = round_step(line.gross * quota, scheme.rounding_step, down=cut)
+        total += line.amount
 
     return Result(lines, quota, total_gross, total, summarize(lines, total, scheme))
 
 
 def summarize(lines: list[Line], total: float, scheme: Scheme) -> dict[str, Any]:
-    paid = [l.amount for l in lines if l.eligible]
+    paid = [line.amount for line in lines if line.eligible]
     by_limit: dict[str, int] = {"floor": 0, "cap": 0, "retirement": 0, "not_eligible": 0}
-    for l in lines:
-        if l.limit:
-            by_limit[l.limit] += 1
+    for line in lines:
+        if line.limit:
+            by_limit[line.limit] += 1
     # Plain loop, not sum(): Python 3.12+ sum() uses compensated summation,
     # JavaScript does not, and the parity test compares results bit for bit.
     salary_sum = 0.0
-    for l in lines:
-        if l.eligible:
-            salary_sum += l.monthly_gross
+    for line in lines:
+        if line.eligible:
+            salary_sum += line.monthly_gross
     return {
         "headcount": len(lines),
         "eligible": len(paid),
@@ -272,9 +271,7 @@ class Fit:
         return asdict(self)
 
 
-def fit_budget(
-    employees: list[Employee], scheme: Scheme, budget: float, points: PointsScheme | None = None
-) -> Fit:
+def fit_budget(employees: list[Employee], scheme: Scheme, budget: float, points: PointsScheme | None = None) -> Fit:
     """Find the most generous formula parameter whose total stays within budget.
 
     Searches whole thousandths of the factor (0.725) or tenths of the divisor
@@ -291,8 +288,15 @@ def fit_budget(
 
     if scheme.formula == "factor":
         if total_for(base.with_changes(factor=0.0)) > budget:
-            return Fit(False, "factor", None, None, budget, evals,
-                       "Sockelbeträge und Zuschläge allein übersteigen das Volumen.")
+            return Fit(
+                False,
+                "factor",
+                None,
+                None,
+                budget,
+                evals,
+                "Sockelbeträge und Zuschläge allein übersteigen das Volumen.",
+            )
         lo, hi = 0, FIT_FACTOR_MAX_THOUSANDTHS  # invariant: total(lo) <= budget
         if total_for(base.with_changes(factor=hi / 1000)) <= budget:
             lo = hi
@@ -304,13 +308,15 @@ def fit_budget(
                 hi = mid
         value = lo / 1000
         total = total_for(base.with_changes(factor=value))
-        return Fit(True, "factor", value, total, budget, evals,
-                   f"Höchster Faktor auf drei Nachkommastellen: {value:.3f}")
+        return Fit(
+            True, "factor", value, total, budget, evals, f"Höchster Faktor auf drei Nachkommastellen: {value:.3f}"
+        )
 
     lo_t, hi_t = FIT_DIVISOR_RANGE_TENTHS  # invariant: total(hi) <= budget
     if total_for(base.with_changes(divisor=hi_t / 10)) > budget:
-        return Fit(False, "divisor", None, None, budget, evals,
-                   "Auch mit dem größten Divisor wird das Volumen überschritten.")
+        return Fit(
+            False, "divisor", None, None, budget, evals, "Auch mit dem größten Divisor wird das Volumen überschritten."
+        )
     if total_for(base.with_changes(divisor=lo_t / 10)) <= budget:
         hi_t = lo_t
     while hi_t - lo_t > 1:
@@ -321,8 +327,7 @@ def fit_budget(
             lo_t = mid
     value = hi_t / 10
     total = total_for(base.with_changes(divisor=value))
-    return Fit(True, "divisor", value, total, budget, evals,
-               f"Kleinster Divisor auf eine Nachkommastelle: {value:.1f}")
+    return Fit(True, "divisor", value, total, budget, evals, f"Kleinster Divisor auf eine Nachkommastelle: {value:.1f}")
 
 
 def compare(employees: list[Employee], scenarios: dict[str, Scheme]) -> dict[str, Any]:

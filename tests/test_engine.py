@@ -20,8 +20,10 @@ STICHTAG = date(2026, 12, 31)
 
 def emp(**kw) -> Employee:
     base = dict(
-        id="T-1", name="Test Person",
-        birth_date=date(1980, 6, 15), entry_date=date(2010, 3, 1),
+        id="T-1",
+        name="Test Person",
+        birth_date=date(1980, 6, 15),
+        entry_date=date(2010, 3, 1),
         monthly_gross=4000.0,
     )
     base.update(kw)
@@ -30,20 +32,31 @@ def emp(**kw) -> Employee:
 
 def plain(**kw) -> Scheme:
     """Scheme with every special rule switched off."""
-    s = dict(floor_amount=0, cap_amount=0, retirement_age=0, child_bonus=0,
-             disability_bonus=0, tenure_rounding="full_years", min_tenure_months=0)
+    s = dict(
+        floor_amount=0,
+        cap_amount=0,
+        retirement_age=0,
+        child_bonus=0,
+        disability_bonus=0,
+        tenure_rounding="full_years",
+        min_tenure_months=0,
+    )
     s.update(kw)
     return Scheme(**s)
 
 
 # --- dates ----------------------------------------------------------------- #
 
-@pytest.mark.parametrize("start,end,months", [
-    (date(2010, 3, 1), date(2026, 12, 31), 201),
-    (date(2026, 1, 31), date(2026, 2, 28), 0),   # not a completed month
-    (date(2026, 1, 15), date(2026, 2, 15), 1),
-    (date(2027, 1, 1), date(2026, 12, 31), 0),   # entry after Stichtag
-])
+
+@pytest.mark.parametrize(
+    "start,end,months",
+    [
+        (date(2010, 3, 1), date(2026, 12, 31), 201),
+        (date(2026, 1, 31), date(2026, 2, 28), 0),  # not a completed month
+        (date(2026, 1, 15), date(2026, 2, 15), 1),
+        (date(2027, 1, 1), date(2026, 12, 31), 0),  # entry after Stichtag
+    ],
+)
 def test_full_months(start, end, months):
     assert full_months(start, end) == months
 
@@ -53,30 +66,37 @@ def test_age_counts_birthday_on_stichtag():
     assert age_at(date(1967, 1, 1), STICHTAG) == 59
 
 
-@pytest.mark.parametrize("months,mode,years", [
-    (201, "full_years", 16.0),   # 16 years 9 months
-    (201, "half_up", 17.0),      # >= 6 months counts as a started year
-    (197, "half_up", 16.0),      # 16 years 5 months
-    (198, "half_up", 17.0),      # exactly 6 months rounds up
-    (201, "months", 16.75),
-])
+@pytest.mark.parametrize(
+    "months,mode,years",
+    [
+        (201, "full_years", 16.0),  # 16 years 9 months
+        (201, "half_up", 17.0),  # >= 6 months counts as a started year
+        (197, "half_up", 16.0),  # 16 years 5 months
+        (198, "half_up", 17.0),  # exactly 6 months rounds up
+        (201, "months", 16.75),
+    ],
+)
 def test_tenure_rounding(months, mode, years):
     assert tenure_years(months, mode) == years
 
 
-@pytest.mark.parametrize("x,step,down,expected", [
-    (6001.5, 1, False, 6002),
-    (6001.49, 1, False, 6001),
-    (6001.99, 1, True, 6001),
-    (12345, 10, False, 12350),
-    (12344.9, 100, False, 12300),
-    (1.005 * 1000, 1, False, 1005),   # float noise must not flip the result
-])
+@pytest.mark.parametrize(
+    "x,step,down,expected",
+    [
+        (6001.5, 1, False, 6002),
+        (6001.49, 1, False, 6001),
+        (6001.99, 1, True, 6001),
+        (12345, 10, False, 12350),
+        (12344.9, 100, False, 12300),
+        (1.005 * 1000, 1, False, 1005),  # float noise must not flip the result
+    ],
+)
 def test_round_step(x, step, down, expected):
     assert round_step(x, step, down) == expected
 
 
 # --- formulas -------------------------------------------------------------- #
+
 
 def test_factor_formula():
     # 16 full years x 4,000 x 0.75 = 48,000
@@ -130,6 +150,7 @@ def test_min_tenure_excludes_recent_hires():
 
 # --- budget ---------------------------------------------------------------- #
 
+
 def test_pro_rata_cut_never_exceeds_budget():
     staff = [emp(id=f"T-{i}", monthly_gross=3000.0 + i * 137.0) for i in range(40)]
     s = plain(budget=1_000_000, budget_mode="pro_rata")
@@ -171,6 +192,7 @@ def test_fit_reports_infeasible_budget():
 
 
 # --- Sozialauswahl --------------------------------------------------------- #
+
 
 def test_social_points_bag_scheme():
     # age 46 -> 46; 16 years -> 10 + 6*2 = 22; 2 children -> 8; married 8; disabled 5

@@ -40,7 +40,7 @@ class Employee:
         return d
 
     @classmethod
-    def from_json(cls, d: dict[str, Any]) -> "Employee":
+    def from_json(cls, d: dict[str, Any]) -> Employee:
         return cls(
             id=str(d["id"]),
             name=str(d.get("name", d["id"])),
@@ -97,14 +97,23 @@ class Scheme:
             errors.append("divisor must be > 0")
         if self.rounding_step <= 0:
             errors.append("rounding_step must be > 0")
-        for name in ("factor", "floor_amount", "cap_amount", "child_bonus", "disability_bonus",
-                     "budget", "retirement_cap_months", "min_tenure_months", "retirement_age"):
+        for name in (
+            "factor",
+            "floor_amount",
+            "cap_amount",
+            "child_bonus",
+            "disability_bonus",
+            "budget",
+            "retirement_cap_months",
+            "min_tenure_months",
+            "retirement_age",
+        ):
             if getattr(self, name) < 0:
                 errors.append(f"{name} must not be negative")
         if errors:
             raise ValueError("; ".join(errors))
 
-    def with_changes(self, **changes: Any) -> "Scheme":
+    def with_changes(self, **changes: Any) -> Scheme:
         known = {f.name for f in fields(self)}
         unknown = set(changes) - known
         if unknown:
@@ -119,7 +128,7 @@ class Scheme:
         return d
 
     @classmethod
-    def from_json(cls, d: dict[str, Any]) -> "Scheme":
+    def from_json(cls, d: dict[str, Any]) -> Scheme:
         return cls().with_changes(**d)
 
 
@@ -158,7 +167,7 @@ class Case:
         }
 
     @classmethod
-    def from_json(cls, d: dict[str, Any]) -> "Case":
+    def from_json(cls, d: dict[str, Any]) -> Case:
         return cls(
             title=d.get("title", "Unbenannter Fall"),
             employees=[Employee.from_json(e) for e in d["employees"]],

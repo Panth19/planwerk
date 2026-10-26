@@ -37,9 +37,14 @@ def main() -> None:
         tests = [rel]
     if not tests:
         sys.exit(0)
-    r = subprocess.run([sys.executable, "-m", "pytest", "-q", "-x", *tests], cwd=ROOT,
-                       capture_output=True, text=True, timeout=300,
-                       env={**os.environ, "PLANWERK_AUDIT_FILE": "0"})
+    r = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", "-x", *tests],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=300,
+        env={**os.environ, "PLANWERK_AUDIT_FILE": "0"},
+    )
     if r.returncode != 0:
         tail = "\n".join(r.stdout.strip().splitlines()[-25:])
         print(f"{rel} broke {', '.join(tests)}:\n{tail}", file=sys.stderr)

@@ -32,8 +32,13 @@ SCENARIOS = {
 def js_results(tmp_path_factory):
     d = tmp_path_factory.mktemp("js")
     (d / "scen.json").write_text(json.dumps(SCENARIOS))
-    out = subprocess.run([NODE, str(HERE / "js_runner.js"), str(HERE.parent / "data" / "sample_case.json"),
-                          str(d / "scen.json")], capture_output=True, text=True, check=True, timeout=60)
+    out = subprocess.run(
+        [NODE, str(HERE / "js_runner.js"), str(HERE.parent / "data" / "sample_case.json"), str(d / "scen.json")],
+        capture_output=True,
+        text=True,
+        check=True,
+        timeout=60,
+    )
     return json.loads(out.stdout)
 
 

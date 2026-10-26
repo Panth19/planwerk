@@ -22,10 +22,10 @@
       "Read(./cases/**)",
       "Read(./.env)",
       "Read(./.env.*)",
-      "Bash(git push --force:*)",
-      "WebFetch"
+      "Bash(git push --force:*)"
     ],
     "ask": [
+      "WebFetch",
       "Bash(git push:*)",
       "Bash(scripts/release.sh:*)",
       "Bash(scripts/rollback.sh:*)",

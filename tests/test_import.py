@@ -37,12 +37,30 @@ def test_unknown_headers_are_reported_not_guessed(tmp_path):
     assert set(rep.missing_fields) == {"birth_date", "entry_date", "monthly_gross"}
     assert "Fixum" in rep.unmapped_headers
 
-    fixed = read_employees(p, overrides={"birth_date": "Geburtstag", "entry_date": "Startdatum Konzern",
-                                          "monthly_gross": "Fixum"})
+    fixed = read_employees(
+        p, overrides={"birth_date": "Geburtstag", "entry_date": "Startdatum Konzern", "monthly_gross": "Fixum"}
+    )
     assert fixed.ok and fixed.employees[0].monthly_gross == 5000
 
 
 def test_header_normalisation():
-    mapping, unmapped = map_headers(["Brutto-Monatsgehalt", "Geburts­datum".replace("­", ""), "Kommentar"])
+    mapping, unmapped = map_headers(["Brutto-Monatsgehalt", "Geb.-Datum (TT.MM.JJJJ)", "Kommentar"])
     assert mapping["monthly_gross"] == "Brutto-Monatsgehalt"
+    assert mapping["birth_date"] == "Geb.-Datum (TT.MM.JJJJ)"
     assert unmapped == ["Kommentar"]
+
+
+def test_export_never_turns_client_text_into_formulas(sample_case, tmp_path):
+    from dataclasses import replace
+
+    from openpyxl import load_workbook
+
+    evil = replace(sample_case.employees[0], id="=1+1", name='=HYPERLINK("http://x","klick")')
+    sample_case.employees[0] = evil
+    sample_case.title = "=cmd|' /C calc'!A0"
+    path = export_workbook(sample_case, tmp_path / "x.xlsx")
+    wb = load_workbook(path)
+    a = wb["Anlage 1"]
+    assert a["A2"].data_type == "s" and a["B2"].data_type == "s"
+    assert wb["Parameter"]["A1"].data_type == "s"
+    assert a["S2"].data_type == "f"  # our own formulas stay formulas

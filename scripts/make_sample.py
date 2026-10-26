@@ -20,16 +20,89 @@ sys.path.insert(0, str(ROOT))
 
 from planwerk.model import Case, Employee, Scheme  # noqa: E402
 
-FIRST = (
-    "Anna Ben Clara David Elif Felix Greta Hannes Ida Jonas Katrin Lukas Mara Niklas "
-    "Olga Paul Rania Simon Tanja Ugur Vera Yusuf Zoe Jan Lea Malte Nora Tim Selin Kai "
-    "Birgit Detlef Heike Jürgen Monika Rainer Sabine Uwe Petra Frank Dragan Ewa Marek"
-).split()
-LAST = (
-    "Albers Brandt Celik Dietrich Engel Fuchs Gerber Hahn Jansen Kaya Lorenz Marx Nowak "
-    "Otto Peters Quast Roth Sommer Thiel Ulrich Vogel Winter Yilmaz Zimmer Becker Kowalski "
-    "Schreiber Haas Krüger Lindner Pohl Wagner Brückner Ostermann Petrović Szymańska"
-).split()
+FIRST = [
+    "Anna",
+    "Ben",
+    "Clara",
+    "David",
+    "Elif",
+    "Felix",
+    "Greta",
+    "Hannes",
+    "Ida",
+    "Jonas",
+    "Katrin",
+    "Lukas",
+    "Mara",
+    "Niklas",
+    "Olga",
+    "Paul",
+    "Rania",
+    "Simon",
+    "Tanja",
+    "Ugur",
+    "Vera",
+    "Yusuf",
+    "Zoe",
+    "Jan",
+    "Lea",
+    "Malte",
+    "Nora",
+    "Tim",
+    "Selin",
+    "Kai",
+    "Birgit",
+    "Detlef",
+    "Heike",
+    "Jürgen",
+    "Monika",
+    "Rainer",
+    "Sabine",
+    "Uwe",
+    "Petra",
+    "Frank",
+    "Dragan",
+    "Ewa",
+    "Marek",
+]
+LAST = [
+    "Albers",
+    "Brandt",
+    "Celik",
+    "Dietrich",
+    "Engel",
+    "Fuchs",
+    "Gerber",
+    "Hahn",
+    "Jansen",
+    "Kaya",
+    "Lorenz",
+    "Marx",
+    "Nowak",
+    "Otto",
+    "Peters",
+    "Quast",
+    "Roth",
+    "Sommer",
+    "Thiel",
+    "Ulrich",
+    "Vogel",
+    "Winter",
+    "Yilmaz",
+    "Zimmer",
+    "Becker",
+    "Kowalski",
+    "Schreiber",
+    "Haas",
+    "Krüger",
+    "Lindner",
+    "Pohl",
+    "Wagner",
+    "Brückner",
+    "Ostermann",
+    "Petrović",
+    "Szymańska",
+]
 
 
 def build(n: int = 140, seed: int = 1907) -> Case:
@@ -52,20 +125,23 @@ def build(n: int = 140, seed: int = 1907) -> Case:
         if rng.random() < 0.04:  # a few very recent hires below the 6-month line
             entry = stichtag - timedelta(days=rng.randint(30, 170))
         level = rng.choices([0, 1, 2, 3], weights=[38, 34, 20, 8])[0]
-        salary = [rng.uniform(2900, 3800), rng.uniform(3800, 5200),
-                  rng.uniform(5200, 7400), rng.uniform(7400, 11800)][level]
+        salary = [rng.uniform(2900, 3800), rng.uniform(3800, 5200), rng.uniform(5200, 7400), rng.uniform(7400, 11800)][
+            level
+        ]
         salary = round(salary / 10) * 10
         children = rng.choices([0, 1, 2, 3], weights=[48, 22, 22, 8])[0] if age < 58 else 0
-        employees.append(Employee(
-            id=f"MA-{i + 1:03d}",
-            name=name,
-            birth_date=birth,
-            entry_date=entry,
-            monthly_gross=float(salary),
-            children=children,
-            married=rng.random() < 0.55,
-            disabled=rng.random() < 0.07,
-        ))
+        employees.append(
+            Employee(
+                id=f"MA-{i + 1:03d}",
+                name=name,
+                birth_date=birth,
+                entry_date=entry,
+                monthly_gross=float(salary),
+                children=children,
+                married=rng.random() < 0.55,
+                disabled=rng.random() < 0.07,
+            )
+        )
     return Case(
         title="Halberg Feinmechanik GmbH, Werk Offenbach (synthetisch)",
         employees=employees,

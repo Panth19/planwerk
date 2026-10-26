@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Literal
 
 
 @dataclass(frozen=True)
@@ -28,7 +28,7 @@ class Route:
     max_tokens: int
     thinking: dict[str, Any] | None
     effort: str | None
-    privacy_level: str = "aggregates"
+    privacy_level: Literal["aggregates", "pseudonymized"] = "aggregates"
 
     def api_kwargs(self) -> dict[str, Any]:
         kw: dict[str, Any] = {"model": self.model, "max_tokens": self.max_tokens}
@@ -47,8 +47,7 @@ CLOUD: dict[str, Route] = {
 
 LOCAL_MODEL = os.environ.get("PLANWERK_LOCAL_MODEL", "qwen3-32b-instruct")
 LOCAL: dict[str, Route] = {
-    task: Route(LOCAL_MODEL, r.max_tokens, None, None, privacy_level="pseudonymized")
-    for task, r in CLOUD.items()
+    task: Route(LOCAL_MODEL, r.max_tokens, None, None, privacy_level="pseudonymized") for task, r in CLOUD.items()
 }
 
 
