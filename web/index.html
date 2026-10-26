@@ -110,6 +110,7 @@ main { padding-block: 24px 40px; }
   background: var(--field); font-size: 1.06rem; line-height: 1.5;
 }
 .formula .op { color: var(--ink-3); padding: 0 .25em; }
+.formula .nw { white-space: nowrap; }
 .hint { font-family: var(--f-ui); font-size: var(--t-xs); color: var(--ink-3); border-top: 1px solid var(--rule-soft); padding-top: 12px; margin-top: 22px; }
 
 /* inline fields: the negotiable numbers of the agreement */
@@ -320,8 +321,8 @@ const T = {
     s1: (f) => `Dieser Sozialplan gilt für alle Beschäftigten, deren Arbeitsverhältnis infolge der Betriebsänderung endet und die am Stichtag ${f("stichtag")} dem Betrieb seit mindestens ${f("min_tenure_months")} Monaten angehören.`,
     s2h: "Abfindung",
     s2a: (f) => `Die Abfindung wird nach der ${f("formula")} berechnet:`,
-    fFactor: (f) => `Betriebszugehörigkeit <span class="op">×</span> Bruttomonatsgehalt <span class="op">×</span> ${f("factor")}`,
-    fDivisor: (f) => `Lebensalter <span class="op">×</span> Betriebszugehörigkeit <span class="op">×</span> Bruttomonatsgehalt <span class="op">÷</span> ${f("divisor")}`,
+    fFactor: (f) => `Betriebszugehörigkeit <span class="op">×</span> Bruttomonatsgehalt <span class="nw"><span class="op">×</span> ${f("factor")}</span>`,
+    fDivisor: (f) => `Lebensalter <span class="op">×</span> Betriebszugehörigkeit <span class="op">×</span> Bruttomonatsgehalt <span class="nw"><span class="op">÷</span> ${f("divisor")}</span>`,
     s2b: (f) => `Die Betriebszugehörigkeit zählt ${f("tenure_rounding")}.`,
     formula: { factor: "Standardformel", divisor: "Divisorformel" },
     tenure: { half_up: "in vollen Jahren, ab sechs Monaten aufgerundet", full_years: "in vollen Jahren, Restmonate entfallen", months: "monatsgenau" },
@@ -383,8 +384,8 @@ const T = {
     s1: (f) => `This social plan applies to all employees whose employment ends as a result of the restructuring and who, on the reference date ${f("stichtag")}, have been with the company for at least ${f("min_tenure_months")} months.`,
     s2h: "Severance",
     s2a: (f) => `Severance is calculated with the ${f("formula")}:`,
-    fFactor: (f) => `Years of service <span class="op">×</span> monthly gross salary <span class="op">×</span> ${f("factor")}`,
-    fDivisor: (f) => `Age <span class="op">×</span> years of service <span class="op">×</span> monthly gross salary <span class="op">÷</span> ${f("divisor")}`,
+    fFactor: (f) => `Years of service <span class="op">×</span> monthly gross salary <span class="nw"><span class="op">×</span> ${f("factor")}</span>`,
+    fDivisor: (f) => `Age <span class="op">×</span> years of service <span class="op">×</span> monthly gross salary <span class="nw"><span class="op">÷</span> ${f("divisor")}</span>`,
     s2b: (f) => `Years of service are counted ${f("tenure_rounding")}.`,
     formula: { factor: "standard formula", divisor: "divisor formula" },
     tenure: { half_up: "in full years, rounded up from six months", full_years: "in full years, remaining months dropped", months: "to the month" },

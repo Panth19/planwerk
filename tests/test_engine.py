@@ -173,9 +173,9 @@ def test_fit_reports_infeasible_budget():
 # --- Sozialauswahl --------------------------------------------------------- #
 
 def test_social_points_bag_scheme():
-    # age 46 -> 46; 16 years -> 10 + 6*2 = 22; 2 children -> 8; married 4; disabled 5
+    # age 46 -> 46; 16 years -> 10 + 6*2 = 22; 2 children -> 8; married 8; disabled 5
     e = emp(children=2, married=True, disabled=True)
-    assert social_points(46, 201, e, PointsScheme()) == 46 + 22 + 8 + 4 + 5
+    assert social_points(46, 201, e, PointsScheme()) == 46 + 22 + 8 + 8 + 5
 
 
 def test_unknown_scheme_field_is_rejected():

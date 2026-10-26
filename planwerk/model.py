@@ -129,14 +129,14 @@ class PointsScheme:
 
     Defaults follow the scheme the BAG has accepted many times:
     1 point per year of age, 1 per year of service (2 from year 11),
-    4 per child, 4 if married, 5 for Schwerbehinderung.
+    4 per child, 8 for a spouse, 5 for Schwerbehinderung.
     """
 
     per_year_age: int = 1
     per_year_tenure: int = 1
     per_year_tenure_after_10: int = 2
     per_child: int = 4
-    married: int = 4
+    married: int = 8
     disabled: int = 5
 
 

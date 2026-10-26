@@ -37,7 +37,7 @@
     per_year_tenure: 1,
     per_year_tenure_after_10: 2,
     per_child: 4,
-    married: 4,
+    married: 8,
     disabled: 5,
   });
 
