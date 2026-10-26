@@ -181,3 +181,12 @@ def test_social_points_bag_scheme():
 def test_unknown_scheme_field_is_rejected():
     with pytest.raises(ValueError):
         Scheme().with_changes(faktor=0.8)
+
+
+def test_exact_half_survives_float_noise():
+    # Regression: 298 months = 24.8333.. years; x 5,980 x 0.75 = 111,377.50 exactly,
+    # but binary floats give 111,377.4999999. Must round up, in engine and in Excel.
+    e = emp(entry_date=date(2002, 2, 26), monthly_gross=5980.0)
+    r = calculate([e], plain(tenure_rounding="months"))
+    assert r.lines[0].tenure_months == 298
+    assert r.total == 111_378

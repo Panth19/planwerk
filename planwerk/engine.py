@@ -64,14 +64,20 @@ def tenure_years(months: int, mode: str) -> float:
     raise ValueError(f"unknown tenure_rounding: {mode}")
 
 
-def _excel_precision(x: float) -> float:
-    """Spreadsheets compute on 15 significant digits before rounding."""
-    return float(f"{x:.15g}")
+def clean(x: float) -> float:
+    """Snap to 6 decimals so float noise cannot flip a rounding decision.
+
+    24.8333... x 5,980 x 0.75 is exactly 111,377.50 on paper but
+    111,377.49999999999 in binary floating point. Without this step the engine
+    and LibreOffice disagreed by 1 EUR on exactly such a row. Excel export uses
+    the same ROUND(x, 6) before the final rounding.
+    """
+    return math.floor(x * 1e6 + 0.5) / 1e6
 
 
 def round_step(x: float, step: float, down: bool = False) -> float:
-    """Round to a multiple of ``step``. Half up like Excel ROUND, or down."""
-    v = _excel_precision(x / step)
+    """Round a non-negative amount to a multiple of ``step``: half up, or down."""
+    v = clean(clean(x) / step)
     n = math.floor(v) if down else math.floor(v + 0.5)
     return n * step
 
