@@ -9,35 +9,62 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: "3.12" }
+        with: { python-version: "3.12", cache: pip }
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - run: pip install -e ".[dev]"
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: mypy planwerk
+      - run: node --check web/engine.js && node --check web/importer.js
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "${{ matrix.python }}", cache: pip }
       - uses: actions/setup-node@v4
         with: { node-version: "20" }
       - name: LibreOffice for the Excel parity test
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libreoffice-calc
-      - run: pip install -e ".[dev,mcp,ai]"
-      - name: Tests (engine, JS parity, Excel parity, privacy, API, MCP, hooks)
+      - run: pip install -e ".[dev]" playwright
+      - run: python -m playwright install --with-deps chromium
+      - name: Tests (engine, JS and Excel parity, import, privacy, API, MCP, CLI, hooks, browser)
         run: python -m pytest -q
-        env: { PLANWERK_AUDIT_FILE: "0" }
       - name: Sample data is still the synthetic one
         run: python scripts/make_sample.py && git diff --exit-code data/sample_case.json
 
   pages:
-    needs: test
+    needs: [lint, test]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    permissions: { pages: write, id-token: write }
-    environment: { name: github-pages, url: "${{ steps.deploy.outputs.page_url }}" }
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: python scripts/build_static.py
+      - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with: { path: dist }
       - id: deploy

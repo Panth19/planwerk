@@ -10,10 +10,10 @@ The work splits along the seams of the system, so that agents rarely touch the s
 | Lane | Files | Done when |
 |---|---|---|
 | engine | `planwerk/engine.py`, `planwerk/model.py`, `web/engine.js` | engine + JS parity tests green |
-| excel | `planwerk/excel.py` | LibreOffice parity green for all scenarios |
+| excel | `planwerk/excel.py`, `web/importer.js` | LibreOffice parity and import parity green |
 | ai | `planwerk/assistant.py`, `routing.py`, `privacy.py` | assistant + privacy tests green, privacy-auditor clean |
 | interfaces | `planwerk/api.py`, `mcp_server.py`, `cli.py` | API/MCP tests green |
-| ui | `web/index.html` | screenshots in light, dark and at 400 px reviewed |
+| ui | `web/index.html` | browser tests green; screenshots in light, dark and at 400 px reviewed |
 
 Each lane runs in its own git worktree (`git worktree add ../planwerk-<lane> -b <lane>/...`),
 so parallel agents never share a working directory.
@@ -82,3 +82,19 @@ Real issues from building this repo, each caught by a test or hook before it shi
 | 4 | The assistant crashed after a successful tool call when building its audit log entry (wrong key in the trace). | Assistant tests with a scripted fake model | One-line fix; tests run without network or key |
 | 5 | The API accepted `formula: "magic"` and failed later deep in the engine with a 500. | API test for bad input | Validation in `Scheme.__post_init__`; bad input is a 422 with a reason |
 | 6 | The data hook blocked edits to its own test file, which contains the forbidden examples it must catch. | Hook tests | Explicit exemption for `tests/test_hooks.py` only |
+
+### Review before the first release
+
+A full review (lint, types, a clean install on 3.11 to 3.13, a browser run, a security pass)
+found the following. Each fix came with the test that would have caught it.
+
+| # | What happened | Caught by | Fix |
+|---|---|---|---|
+| 7 | On a fresh install every upload failed: FastAPI needs `python-multipart`, which was only present on the dev machine. | Clean venv install | Declared dependency; CI installs from scratch on three Python versions |
+| 8 | The browser importer accepted 31 February; the server rejected it. | `test_js_import.py`, which feeds the same files to both importers | Calendar check in `importer.js` |
+| 9 | A German list with `4.250` (no cents) was read as 4.25 €, an English `4,250.50` as 4.25 €. | Review of the import, then tests | Both notations parsed; last separator wins when both appear |
+| 10 | A name like `=HYPERLINK(...)` from a client file would have become a live formula in the exported workbook. | Security review | Client text is written as text; test with hostile values |
+| 11 | Every Excel download left a temp folder behind. | Review | Deleted after the response; test checks the temp dir is empty |
+| 12 | `deploy.sh v1.0.0` would have named the image after the tag object, not the commit, so the health check could never match. | Review | `rev-parse "$REF^{commit}"`; shellcheck in the loop |
+| 13 | In German mode, typing `0.8` into the factor field gave 8. | Browser test | Number parsing that reads both notations per field |
+| 14 | The strict CSP also blocked Playwright's `wait_for_function`, which uses eval. | Browser tests | Locator-based waits; the CSP stays strict |

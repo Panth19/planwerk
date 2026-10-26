@@ -27,6 +27,7 @@ testpaths = ["tests"]
 markers = [
     "libreoffice: needs a headless LibreOffice (soffice) on PATH",
     "node: needs Node.js on PATH",
+    "browser: needs Playwright with Chromium",
 ]
 
 [build-system]

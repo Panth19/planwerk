@@ -5,7 +5,7 @@ costs and how often the task runs, not one model for the whole app.
 
 | Task | Model | Thinking | Effort | Why |
 |---|---|---|---|---|
-| `header_mapping` | Claude Haiku 5.5 | disabled | low | Runs on every import, sees ~10 header strings, answer is a tiny JSON object that we validate anyway. Latency and cost matter, depth does not. |
+| `header_mapping` | Claude Haiku 5.5 | disabled | low | Runs when an import has columns the synonym list does not know. Sees ~10 header strings, never a row; the answer is a tiny JSON object that is validated against the real headers. Latency and cost matter, depth does not. |
 | `scenario_qa` | Claude Sonnet 5.5 | `between_tools` | medium | Multi-step tool use: understand the question, pick changes, call the engine, maybe call it again, explain. Thinking between tool calls is where the value is; the engine does the maths, so there is no need for a top model to "be careful with numbers". |
 | `partner_memo` | Claude Opus 5.5 | adaptive | high | Rare (a few times per case), read by a partner, sets the tone of a negotiation. Worth the strongest model and the extra seconds. |
 

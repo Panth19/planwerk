@@ -1,0 +1,12 @@
+.git
+.github
+.claude
+.venv
+dist
+out
+logs
+cases
+tests
+docs
+**/__pycache__
+*.xlsx

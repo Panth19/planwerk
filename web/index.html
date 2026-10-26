@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Planwerk Sozialplan-Rechner</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Sozialplan-Rechner: Abfindungsformel, Sockel, Höchstbetrag und Volumen als bearbeitbarer Sozialplantext, mit Anlage 1 und Excel-Export.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%233540b0'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' text-anchor='middle' fill='white'%3E§%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap">
@@ -121,7 +123,7 @@ main { padding-block: 24px 40px; }
   transition: background-color .5s ease;
 }
 select.f { text-align: left; padding-right: 2px; cursor: pointer; max-width: 100%; }
-input[type="date"].f { text-align: left; }
+#f-stichtag { text-align: left; }
 .f:hover { background: var(--stamp-soft); }
 .f[aria-invalid="true"] { color: var(--over); border-bottom-color: var(--over); background: var(--over-soft); }
 .f.flash { background: var(--stamp); color: var(--sheet); }
@@ -217,6 +219,35 @@ tr.ne td { color: var(--ink-3); }
 tfoot td { font-weight: 600; border-bottom: 0; border-top: 1px solid var(--rule); }
 .empty { padding: 28px; text-align: center; color: var(--ink-2); }
 
+.linkbtn { border: 0; background: none; padding: 0; color: var(--stamp); font: inherit; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+.hint { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: space-between; }
+
+/* Phones: the document comes first, so the total stays in view at the bottom. */
+.mobilebar { display: none; }
+@media (max-width: 980px) {
+  .mobilebar {
+    display: flex; align-items: baseline; gap: 4px 12px; flex-wrap: wrap;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+    background: var(--sheet); border-top: 1px solid var(--rule); box-shadow: 0 -6px 18px -12px rgba(0,0,0,.35);
+    padding-top: 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+    font-size: var(--t-s);
+  }
+  .mobilebar .total-sm { font-weight: 600; font-size: var(--t-l); }
+  body { padding-bottom: 64px; }
+}
+
+@media print {
+  :root { --paper: #fff; --sheet: #fff; }
+  .bar .lang, .actions, .note, .anlage-head .tools, .ask, .mobilebar, .hint .linkbtn, .chart, .legend { display: none !important; }
+  .grid { grid-template-columns: 1fr; }
+  .calc { position: static; }
+  .sheet, .panel, .tablebox { box-shadow: none; border-color: #ccc; break-inside: avoid; }
+  .f { background: none; border-bottom-color: #888; color: #000; }
+  thead th { position: static; }
+  .anlage { break-before: page; }
+}
+
 footer { border-top: 1px solid var(--rule); color: var(--ink-3); font-size: var(--t-xs); }
 footer .wrap { padding-block: 16px 28px; display: flex; gap: 8px 24px; flex-wrap: wrap; }
 footer p { margin: 0; max-width: 70ch; }
@@ -298,6 +329,10 @@ footer p { margin: 0; max-width: 70ch; }
   </section>
 </main>
 
+<div class="mobilebar" aria-hidden="true">
+  <div class="total-sm" id="mbTotal"></div><div id="mbDelta"></div>
+</div>
+
 <footer>
   <div class="wrap">
     <p id="tFoot"></p>
@@ -306,6 +341,7 @@ footer p { margin: 0; max-width: 70ch; }
 </footer>
 
 <script src="engine.js"></script>
+<script src="importer.js"></script>
 <script>
 (function () {
 "use strict";
@@ -325,7 +361,7 @@ const T = {
     fDivisor: (f) => `Lebensalter <span class="op">×</span> Betriebszugehörigkeit <span class="op">×</span> Bruttomonatsgehalt <span class="nw"><span class="op">÷</span> ${f("divisor")}</span>`,
     s2b: (f) => `Die Betriebszugehörigkeit zählt ${f("tenure_rounding")}.`,
     formula: { factor: "Standardformel", divisor: "Divisorformel" },
-    tenure: { half_up: "in vollen Jahren, ab sechs Monaten aufgerundet", full_years: "in vollen Jahren, Restmonate entfallen", months: "monatsgenau" },
+    tenure: { half_up: "ab 6 Monaten als volles Jahr", full_years: "nur in vollen Jahren", months: "monatsgenau" },
     s3h: "Mindest- und Höchstbetrag",
     s3: (f) => `Der Betrag nach § 2 beträgt mindestens ${f("floor_amount")} € und höchstens ${f("cap_amount")} €. Der Wert 0 bedeutet keine Grenze.`,
     s4h: "Rentennahe Jahrgänge",
@@ -339,6 +375,17 @@ const T = {
     s7: (f) => `Jeder Betrag wird auf ${f("rounding_step")} gerundet.`,
     steps: { 1: "volle Euro", 10: "volle 10 Euro", 100: "volle 100 Euro" },
     hint: "Die blau unterlegten Werte sind Eingabefelder. Jede Änderung rechnet sofort neu.",
+    reset: "Ausgangswerte wiederherstellen",
+    resetDone: "Ausgangswerte wiederhergestellt.",
+    floorOverCap: "Der Sockelbetrag liegt über dem Höchstbetrag. Gerechnet wird mit dem Höchstbetrag.",
+    labels: {
+      stichtag: "Stichtag", min_tenure_months: "Mindestbetriebszugehörigkeit in Monaten", formula: "Abfindungsformel",
+      factor: "Faktor", divisor: "Divisor", tenure_rounding: "Zählweise der Betriebszugehörigkeit",
+      floor_amount: "Sockelbetrag in Euro", cap_amount: "Höchstbetrag in Euro", retirement_age: "Alter für rentennahe Jahrgänge",
+      retirement_cap_months: "Höchstens Monatsgehälter für rentennahe Jahrgänge", child_bonus: "Zuschlag je Kind in Euro",
+      disability_bonus: "Zuschlag bei Schwerbehinderung in Euro", budget: "Sozialplanvolumen in Euro",
+      budget_mode: "Anteilige Kürzung bei Überschreitung", rounding_step: "Rundung",
+    },
     cost: "Kosten des Sozialplans",
     over: (d, b) => `${d} über dem Volumen von ${b}`,
     under: (d, b) => `${d} unter dem Volumen von ${b}`,
@@ -370,7 +417,9 @@ const T = {
     cols: { id: "Nr.", name: "Name", age: "Alter", tenure_years: "BZ (J.)", monthly_gross: "Brutto/Monat", base: "Grundbetrag", bonus: "Zuschläge", amount: "Abfindung", points: "Punkte", limit: "Hinweis" },
     sum: "Summe", none: "Keine Treffer für diese Suche.",
     synthetic: "Synthetische Daten", own: "Eigene Daten, nur in diesem Browser",
-    imported: (n) => `${n} Personen importiert. Die Daten bleiben in diesem Browser.`,
+    imported: (n, w) => `${n} ${n === 1 ? "Person" : "Personen"} importiert. Die Daten bleiben in diesem Browser.` +
+      (w ? (w === 1 ? " 1 Zeile mit Hinweis: " : ` ${w} Zeilen mit Hinweisen: `) : ""),
+    mapped: (m) => ` Spalten automatisch zugeordnet, bitte prüfen: ${m}.`,
     importErr: (m) => `Import nicht möglich: ${m}`,
     missing: (f) => `Pflichtspalten fehlen: ${f}. Erwartet werden u. a. Geburtsdatum, Eintritt und Brutto.`,
     foot: "Rechenhilfe, keine Rechtsberatung. Engine in Python und JavaScript, Excel-Export mit Live-Formeln; alle drei werden in der Test-Suite gegeneinander geprüft.",
@@ -388,7 +437,7 @@ const T = {
     fDivisor: (f) => `Age <span class="op">×</span> years of service <span class="op">×</span> monthly gross salary <span class="nw"><span class="op">÷</span> ${f("divisor")}</span>`,
     s2b: (f) => `Years of service are counted ${f("tenure_rounding")}.`,
     formula: { factor: "standard formula", divisor: "divisor formula" },
-    tenure: { half_up: "in full years, rounded up from six months", full_years: "in full years, remaining months dropped", months: "to the month" },
+    tenure: { half_up: "in full years, 6+ months up", full_years: "in full years only", months: "to the month" },
     s3h: "Minimum and maximum",
     s3: (f) => `The amount under § 2 is at least € ${f("floor_amount")} and at most € ${f("cap_amount")}. A value of 0 means no limit.`,
     s4h: "Close to retirement",
@@ -402,6 +451,17 @@ const T = {
     s7: (f) => `Each amount is rounded to ${f("rounding_step")}.`,
     steps: { 1: "full euros", 10: "full 10 euros", 100: "full 100 euros" },
     hint: "Values highlighted in blue are input fields. Every change recalculates immediately.",
+    reset: "Restore starting values",
+    resetDone: "Starting values restored.",
+    floorOverCap: "The minimum is above the maximum. The maximum applies.",
+    labels: {
+      stichtag: "Reference date", min_tenure_months: "Minimum service in months", formula: "Severance formula",
+      factor: "Factor", divisor: "Divisor", tenure_rounding: "How years of service are counted",
+      floor_amount: "Minimum amount in euros", cap_amount: "Maximum amount in euros", retirement_age: "Age for the retirement rule",
+      retirement_cap_months: "Maximum monthly salaries close to retirement", child_bonus: "Supplement per child in euros",
+      disability_bonus: "Supplement for severe disability in euros", budget: "Total volume in euros",
+      budget_mode: "Pro-rata reduction if the volume is exceeded", rounding_step: "Rounding",
+    },
     cost: "Cost of the social plan",
     over: (d, b) => `${d} over the volume of ${b}`,
     under: (d, b) => `${d} under the volume of ${b}`,
@@ -433,7 +493,9 @@ const T = {
     cols: { id: "No.", name: "Name", age: "Age", tenure_years: "Service (yrs)", monthly_gross: "Gross/month", base: "Base amount", bonus: "Supplements", amount: "Severance", points: "Points", limit: "Note" },
     sum: "Total", none: "No matches for this search.",
     synthetic: "Synthetic data", own: "Your data, only in this browser",
-    imported: (n) => `${n} people imported. The data stays in this browser.`,
+    imported: (n, w) => `${n} ${n === 1 ? "person" : "people"} imported. The data stays in this browser.` +
+      (w ? (w === 1 ? " 1 row with a note: " : ` ${w} rows with notes: `) : ""),
+    mapped: (m) => ` Columns matched automatically, please check: ${m}.`,
     importErr: (m) => `Import failed: ${m}`,
     missing: (f) => `Required columns missing: ${f}. Expected e.g. date of birth, entry date and gross salary.`,
     foot: "Calculation aid, not legal advice. Engine in Python and JavaScript, Excel export with live formulas; the test suite checks all three against each other.",
@@ -471,22 +533,50 @@ const eurShort = (x) => {
 const num = (x, d) => nf(d).format(x);
 const rangeText = (a, b) => state.lang === "de"
   ? `${nf(0).format(a / 1000)}–${nf(0).format(b / 1000)} Tsd. €` : `€${nf(0).format(a / 1000)}k–${nf(0).format(b / 1000)}k`;
-function parseNum(s) {
-  s = String(s).replace(/[\s€]/g, "");
-  if (state.lang === "de") s = s.replace(/\./g, "").replace(",", ".");
-  else s = s.replace(/,/g, "");
-  if (s === "" || !/^-?\d*\.?\d+$/.test(s)) return NaN;
-  return Number(s);
+// Accepts what people actually type in either language: 150.000 / 150,000 /
+// 150000 for amounts, 0,75 / 0.75 for the factor. A single separator followed by
+// exactly three digits is a thousands separator only in whole-number fields.
+function parseNum(raw, dec) {
+  let s = String(raw).replace(/[\s€]/g, "");
+  if (!/^(\d[\d.,]*|[.,]\d+)$/.test(s)) return NaN;
+  const dots = s.split(".").length - 1, commas = s.split(",").length - 1;
+  let decimal = null;
+  if (dots && commas) decimal = s.lastIndexOf(",") > s.lastIndexOf(".") ? "," : ".";
+  else if (dots || commas) {
+    const sep = dots ? "." : ",", parts = s.split(sep);
+    const grouping = parts.length > 2 ? parts.slice(1).every((q) => q.length === 3) : parts[1].length === 3 && dec === 0;
+    if (grouping) s = parts.join(""); else decimal = sep;
+  }
+  if (decimal) s = s.split(decimal === "." ? "," : ".").join("").replace(decimal, ".");
+  if ((s.match(/\./g) || []).length > 1) return NaN;
+  const n = Number(s);
+  return isFinite(n) ? n : NaN;
+}
+const pad2 = (n) => String(n).padStart(2, "0");
+const fmtDate = (iso) => { const [y, m, d] = iso.split("-"); return state.lang === "de" ? `${d}.${m}.${y}` : `${d}/${m}/${y}`; };
+// 31.12.2026, 31/12/2026 or 2026-12-31; only dates that exist in the calendar.
+function parseDate(raw) {
+  const s = String(raw).trim();
+  let m = s.match(/^(\d{1,2})[./](\d{1,2})[./](\d{4})$/), y, mo, d;
+  if (m) [d, mo, y] = [m[1], m[2], m[3]].map(Number);
+  else if ((m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/))) [y, mo, d] = [m[1], m[2], m[3]].map(Number);
+  else return null;
+  const t = new Date(Date.UTC(y, mo - 1, d));
+  if (y < 1900 || t.getUTCMonth() !== mo - 1 || t.getUTCDate() !== d) return null;
+  return `${y}-${pad2(mo)}-${pad2(d)}`;
 }
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 /* --------------------------------------------------------- the document */
+// min/max are plausibility limits for typing, not legal limits.
 const FIELDS = {
-  factor: { kind: "num", dec: 3 }, divisor: { kind: "num", dec: 1 },
-  min_tenure_months: { kind: "num", dec: 0 }, floor_amount: { kind: "num", dec: 0 },
-  cap_amount: { kind: "num", dec: 0 }, retirement_age: { kind: "num", dec: 0 },
-  retirement_cap_months: { kind: "num", dec: 1 }, child_bonus: { kind: "num", dec: 0 },
-  disability_bonus: { kind: "num", dec: 0 }, budget: { kind: "num", dec: 0 },
+  factor: { kind: "num", dec: 3, min: 0, max: 10 }, divisor: { kind: "num", dec: 1, min: 1, max: 1000 },
+  min_tenure_months: { kind: "num", dec: 0, int: true, min: 0, max: 600 },
+  floor_amount: { kind: "num", dec: 0, min: 0, max: 1e7 }, cap_amount: { kind: "num", dec: 0, min: 0, max: 1e8 },
+  retirement_age: { kind: "num", dec: 0, int: true, min: 0, max: 100 },
+  retirement_cap_months: { kind: "num", dec: 1, min: 0, max: 240 },
+  child_bonus: { kind: "num", dec: 0, min: 0, max: 1e6 }, disability_bonus: { kind: "num", dec: 0, min: 0, max: 1e6 },
+  budget: { kind: "num", dec: 0, min: 0, max: 1e11 },
   stichtag: { kind: "date" }, formula: { kind: "select" }, tenure_rounding: { kind: "select" },
   rounding_step: { kind: "select" }, budget_mode: { kind: "tick" },
 };
@@ -495,14 +585,19 @@ function fieldHtml(name) {
   const s = state.scheme, def = FIELDS[name], L = t();
   if (def.kind === "num") {
     const v = num(s[name], def.dec);
-    return `<input class="f" data-field="${name}" id="f-${name}" inputmode="decimal" autocomplete="off" value="${v}" style="width:${v.length + 1.6}ch" aria-label="${name}">`;
+    return `<input class="f" data-field="${name}" id="f-${name}" inputmode="decimal" autocomplete="off" spellcheck="false" value="${v}" style="width:${v.length + 1.6}ch" aria-label="${esc(L.labels[name])}">`;
   }
-  if (def.kind === "date") return `<input class="f" type="date" data-field="stichtag" id="f-stichtag" value="${s.stichtag}" aria-label="Stichtag">`;
+  if (def.kind === "date") {
+    // A text field, not type="date": the native picker shows the operating system's
+    // format (12/31/2026 on an English Mac), which is wrong in a German document.
+    const v = fmtDate(s.stichtag);
+    return `<input class="f" data-field="stichtag" id="f-stichtag" inputmode="numeric" autocomplete="off" spellcheck="false" value="${v}" style="width:${v.length + 1.6}ch" aria-label="${esc(L.labels.stichtag)}" placeholder="${state.lang === "de" ? "TT.MM.JJJJ" : "DD/MM/YYYY"}">`;
+  }
   if (def.kind === "tick") {
-    return `<label class="tick"><input type="checkbox" data-field="budget_mode" id="f-budget_mode" ${s.budget_mode === "pro_rata" ? "checked" : ""}><span class="sr">pro rata</span></label>`;
+    return `<label class="tick"><input type="checkbox" data-field="budget_mode" id="f-budget_mode" ${s.budget_mode === "pro_rata" ? "checked" : ""}><span class="sr">${esc(L.labels.budget_mode)}</span></label>`;
   }
   const opts = name === "formula" ? L.formula : name === "tenure_rounding" ? L.tenure : L.steps;
-  return `<select class="f" data-field="${name}" id="f-${name}" aria-label="${name}">` +
+  return `<select class="f" data-field="${name}" id="f-${name}" aria-label="${esc(L.labels[name])}">` +
     Object.entries(opts).map(([k, label]) => `<option value="${k}" ${String(s[name]) === String(k) ? "selected" : ""}>${esc(label)}</option>`).join("") +
     `</select>`;
 }
@@ -520,7 +615,7 @@ function renderDoc() {
     para(5, L.s5h, p(0, L.s5(f))) +
     para(6, L.s6h, p(1, L.s6a(f)) + p(2, L.s6b(f))) +
     para(7, L.s7h, p(0, L.s7(f))) +
-    `<p class="hint">${L.hint}</p>`;
+    `<p class="hint"><span>${L.hint}</span> <button type="button" class="linkbtn" id="resetBtn">${L.reset}</button></p>`;
   if (focus) { const el = $("f-" + focus); if (el) el.focus(); }
 }
 
@@ -534,25 +629,67 @@ function onDocInput(ev) {
   const def = FIELDS[name];
   let v;
   if (def.kind === "num") {
-    v = parseNum(el.value);
-    const bad = !isFinite(v) || v < 0 || (name === "divisor" && v === 0);
+    v = parseNum(el.value, def.dec);
+    const bad = !isFinite(v) || v < def.min || v > def.max || (def.int && !Number.isInteger(v));
     el.setAttribute("aria-invalid", bad ? "true" : "false");
     el.style.width = (el.value.length + 1.6) + "ch";
     if (bad) return;
   } else if (def.kind === "tick") v = el.checked ? "pro_rata" : "none";
-  else if (def.kind === "date") { if (!el.value) return; v = el.value; }
+  else if (def.kind === "date") {
+    v = parseDate(el.value);
+    el.setAttribute("aria-invalid", v ? "false" : "true");
+    el.style.width = (el.value.length + 1.6) + "ch";
+    if (!v) return;
+  }
   else v = name === "rounding_step" ? Number(el.value) : el.value;
   state.scheme[name] = v;
   store.set("scheme", state.scheme);
   if (name === "formula") { renderDoc(); updateFitLabel(); }
+  checkConsistency();
   recalc();
+}
+
+// Combinations that compute but are almost certainly a typo.
+function checkConsistency() {
+  const s = state.scheme, cap = $("f-cap_amount"), L = t();
+  const clash = s.cap_amount > 0 && s.floor_amount > s.cap_amount;
+  if (cap) cap.setAttribute("aria-invalid", clash ? "true" : "false");
+  if (clash) $("note").textContent = L.floorOverCap;
+  else if ($("note").textContent === L.floorOverCap) $("note").textContent = "";
+}
+
+function resetScheme() {
+  state.scheme = Object.assign({}, P.DEFAULT_SCHEME, state.baseScheme);
+  store.set("scheme", null);
+  state.pinned = null;
+  renderDoc();
+  updateFitLabel();
+  recalc();
+  $("note").textContent = t().resetDone;
+}
+
+// Values from browser storage may be stale or edited by hand: keep only known, valid ones.
+function sanitizeScheme(stored) {
+  const out = {};
+  if (!stored || typeof stored !== "object") return out;
+  for (const [k, v] of Object.entries(stored)) {
+    const def = FIELDS[k];
+    if (!def || !(k in P.DEFAULT_SCHEME)) continue;
+    if (def.kind === "num" && typeof v === "number" && v >= def.min && v <= def.max) out[k] = v;
+    if (def.kind === "date" && /^\d{4}-\d{2}-\d{2}$/.test(v)) out[k] = v;
+    if (k === "formula" && ["factor", "divisor"].includes(v)) out[k] = v;
+    if (k === "tenure_rounding" && ["months", "full_years", "half_up"].includes(v)) out[k] = v;
+    if (k === "budget_mode" && ["none", "pro_rata"].includes(v)) out[k] = v;
+    if (k === "rounding_step" && [1, 10, 100].includes(v)) out[k] = v;
+  }
+  return out;
 }
 
 function onDocBlur(ev) {
   const el = ev.target, name = el.dataset && el.dataset.field;
-  if (!name || FIELDS[name].kind !== "num") return;
+  if (!name || !["num", "date"].includes(FIELDS[name].kind)) return;
   if (el.getAttribute("aria-invalid") === "true") return;
-  el.value = num(state.scheme[name], FIELDS[name].dec);
+  el.value = FIELDS[name].kind === "date" ? fmtDate(state.scheme[name]) : num(state.scheme[name], FIELDS[name].dec);
   el.style.width = (el.value.length + 1.6) + "ch";
 }
 
@@ -594,6 +731,9 @@ function renderCost() {
   } else d.textContent = L.noBudget;
   stamp.textContent = L.stamp;
   stamp.hidden = !within;
+  $("mbTotal").textContent = eur(total);
+  $("mbDelta").textContent = s.budget > 0 ? (within ? "✓ " : "") + d.textContent.split(";")[0] : "";
+  $("mbDelta").className = d.className;
   if (within && lastWithin === false) { stamp.classList.remove("press"); void stamp.offsetWidth; stamp.classList.add("press"); }
   lastWithin = within;
   renderMeter();
@@ -756,129 +896,73 @@ function renderTable() {
 }
 
 /* --------------------------------------------------------- import/export */
-const SYN = {
-  id: ["personalnummer", "personalnr", "persnr", "pnr", "id", "employeeid", "staffno", "nr"],
-  name: ["name", "mitarbeiter", "mitarbeiterin", "vornamename", "employee", "fullname", "nachnamevorname"],
-  birth_date: ["geburtsdatum", "gebdatum", "geboren", "birthdate", "dateofbirth", "dob", "gebam"],
-  entry_date: ["eintritt", "eintrittsdatum", "beschaeftigtseit", "betriebszugehoerigkeitab", "entrydate", "startdate", "hiredate", "seit"],
-  monthly_gross: ["brutto", "bruttomonatsgehalt", "monatsbrutto", "gehalt", "bruttogehalt", "monthlygross", "salary", "grosssalary", "bruttomonat"],
-  children: ["kinder", "unterhaltspflichtigekinder", "anzahlkinder", "children", "kids"],
-  married: ["verheiratet", "familienstand", "verh", "married", "ehe"],
-  disabled: ["schwerbehindert", "sb", "schwerbehinderung", "gdb50", "disabled", "disability"],
-};
-const normH = (s) => String(s).replace(/\(.*?\)/g, "").trim().toLowerCase()
-  .replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss")
-  .normalize("NFKD").replace(/[^a-z0-9]/g, "");
-const truthy = (v) => typeof v === "boolean" ? v : typeof v === "number" ? v !== 0 : ["1", "true", "ja", "yes", "x", "j", "y", "wahr"].includes(String(v).trim().toLowerCase());
-
-function toIsoDate(v) {
-  if (v instanceof Date) return v.toISOString().slice(0, 10);
-  if (typeof v === "number") { // Excel serial date
-    const d = new Date(Date.UTC(1899, 11, 30) + v * 86400000);
-    return d.toISOString().slice(0, 10);
-  }
-  const s = String(v).trim();
-  let m = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/);
-  if (m) { let y = Number(m[3]); if (y < 100) y += y > 30 ? 1900 : 2000; return `${y}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`; }
-  m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (m) return m[0];
-  throw new Error("Datum " + s);
-}
-function toMoney(v) {
-  if (typeof v === "number") return v;
-  let s = String(v).replace(/[€\s]|EUR/g, "");
-  if (s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
-  const n = Number(s);
-  if (!isFinite(n)) throw new Error("Betrag " + v);
-  return n;
-}
-
-function rowsToEmployees(header, rows) {
-  const map = {};
-  header.forEach((h, i) => {
-    const k = normH(h);
-    const f = Object.keys(SYN).find((f) => SYN[f].includes(k) && !(f in map));
-    if (f) map[f] = i;
-  });
-  const missing = ["birth_date", "entry_date", "monthly_gross"].filter((f) => !(f in map));
-  if (missing.length) throw new Error(t().missing(missing.join(", ")));
-  const out = [];
-  rows.forEach((r, n) => {
-    if (!r || r.every((v) => v === null || v === undefined || String(v).trim() === "")) return;
-    const get = (f) => (f in map ? r[map[f]] : undefined);
-    if (["summe", "total"].includes(String(get("name") || "").trim().toLowerCase())) return;
-    const id = String(get("id") || "MA-" + String(n + 1).padStart(3, "0"));
-    out.push({
-      id, name: String(get("name") || id),
-      birth_date: toIsoDate(get("birth_date")), entry_date: toIsoDate(get("entry_date")),
-      monthly_gross: toMoney(get("monthly_gross")),
-      children: Number(get("children") || 0) || 0,
-      married: truthy(get("married") || false), disabled: truthy(get("disabled") || false),
-    });
-  });
-  return out;
-}
-
-function parseCsv(text) {
-  const first = text.split(/\r?\n/)[0];
-  const delim = [";", "\t", ","].map((d) => [d, first.split(d).length]).sort((a, b) => b[1] - a[1])[0][0];
-  const rows = [];
-  let row = [], cur = "", quoted = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (quoted) {
-      if (c === '"' && text[i + 1] === '"') { cur += '"'; i++; }
-      else if (c === '"') quoted = false;
-      else cur += c;
-    } else if (c === '"') quoted = true;
-    else if (c === delim) { row.push(cur); cur = ""; }
-    else if (c === "\n" || c === "\r") { if (c === "\r" && text[i + 1] === "\n") i++; row.push(cur); rows.push(row); row = []; cur = ""; }
-    else cur += c;
-  }
-  if (cur || row.length) { row.push(cur); rows.push(row); }
-  return rows;
-}
+const I = window.PlanwerkImport;
 
 function loadScript(src) {
   return new Promise((res, rej) => {
     if (window.XLSX) return res();
-    const s = document.createElement("script");
-    s.src = src; s.onload = res; s.onerror = () => rej(new Error("SheetJS"));
-    document.head.appendChild(s);
+    const el = document.createElement("script");
+    el.src = src; el.onload = res; el.onerror = () => rej(new Error("SheetJS konnte nicht geladen werden"));
+    document.head.appendChild(el);
   });
+}
+
+async function readFileRows(file) {
+  if (/\.(xlsx|xlsm)$/i.test(file.name)) {
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js");
+    const wb = window.XLSX.read(await file.arrayBuffer(), { type: "array" });
+    const ws = wb.Sheets["Anlage 1"] || wb.Sheets[wb.SheetNames[0]];
+    return window.XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null });
+  }
+  return I.parseCsv(await file.text());
+}
+
+// Unknown column headers: the server can ask a small model to match them
+// (headers only, never rows). Without a server the import stops and says why.
+async function mapOnServer(file) {
+  const fd = new FormData();
+  fd.append("file", file);
+  const r = await fetch("api/import", { method: "POST", body: fd });
+  const j = await r.json();
+  if (!r.ok) throw new Error(j.detail || r.status);
+  return { employees: j.employees, missing: j.missing_fields, warnings: j.warnings, mapped: j.mapped_by_model };
 }
 
 async function importFile(file) {
   const L = t();
   try {
-    let rows;
-    if (/\.(xlsx|xlsm)$/i.test(file.name)) {
-      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js");
-      const wb = window.XLSX.read(await file.arrayBuffer(), { type: "array" });
-      const ws = wb.Sheets["Anlage 1"] || wb.Sheets[wb.SheetNames[0]];
-      rows = window.XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null });
-    } else {
-      rows = parseCsv(await file.text());
+    const latestYear = Number(String(state.scheme.stichtag).slice(0, 4));
+    let rep = I.readRows(await readFileRows(file), latestYear);
+    let mapped = {};
+    if (rep.missing.length && state.server.assistant) {
+      rep = await mapOnServer(file);
+      mapped = rep.mapped || {};
     }
-    const hi = rows.findIndex((r) => r.filter((v) => v !== null && String(v).trim() !== "").length >= 3);
-    const employees = rowsToEmployees(rows[hi].map((v) => v ?? ""), rows.slice(hi + 1));
-    if (!employees.length) throw new Error("0");
-    state.kase = { title: file.name.replace(/\.[^.]+$/, ""), employees, synthetic: false };
+    if (rep.missing.length) throw new Error(L.missing(rep.missing.join(", ")));
+    if (!rep.employees.length) throw new Error(rep.warnings[0] || "0");
+    state.kase = { title: file.name.replace(/\.[^.]+$/, ""), employees: rep.employees, synthetic: false };
     state.pinned = null;
     renderChrome();
     renderDoc();
     recalc();
-    $("note").textContent = L.imported(employees.length);
+    const m = Object.entries(mapped).map(([f, h]) => `${h} → ${L.labels[f] || f}`).join(", ");
+    $("note").textContent = L.imported(rep.employees.length, rep.warnings.length) +
+      (rep.warnings.length ? rep.warnings.slice(0, 3).join("; ") + (rep.warnings.length > 3 ? " …" : "") : "") +
+      (m ? L.mapped(m) : "");
   } catch (e) {
     $("note").textContent = L.importErr(e.message);
   }
 }
 
+// Text that starts like a formula is prefixed so Excel shows it instead of running it.
+const safeCell = (v) => (/^[=+\-@\t\r]/.test(v) ? "'" + v : v).replace(/[\t\n\r]/g, " ");
+
 async function copyTable() {
   const L = t(), cols = COLS;
+  const dec = state.lang === "de" ? "," : ".";
   const lines = [cols.map((c) => L.cols[c]).join("\t")].concat(
     state.result.lines.map((l) => cols.map((c) => c === "limit" ? (l.limit ? L.legend[l.limit] : "") :
-      typeof l[c] === "number" ? String(l[c]).replace(".", state.lang === "de" ? "," : ".") : l[c]).join("\t")));
+      typeof l[c] === "number" ? String(l[c]).replace(".", dec) : safeCell(String(l[c]))).join("\t")));
   const text = lines.join("\n");
   try { await navigator.clipboard.writeText(text); $("note").textContent = L.copied; }
   catch (e) {
@@ -895,7 +979,9 @@ async function exportXlsx() {
   if (!r.ok) { $("note").textContent = t().importErr(r.status); return; }
   const url = URL.createObjectURL(await r.blob());
   const a = document.createElement("a");
-  a.href = url; a.download = "Sozialplan_Anlage1.xlsx"; document.body.appendChild(a); a.click(); a.remove();
+  const name = (r.headers.get("content-disposition") || "").match(/filename="?([^";]+)"?/);
+  a.href = url; a.download = name ? name[1] : "Sozialplan_Anlage1.xlsx";
+  document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
@@ -949,6 +1035,7 @@ function renderChrome() {
 }
 
 async function detectServer() {
+  if (window.PLANWERK_STATIC) return;
   try {
     const r = await fetch("api/health", { cache: "no-store" });
     if (!r.ok) return;
@@ -972,12 +1059,15 @@ async function loadSample() {
 async function boot() {
   const kase = await loadSample();
   state.kase = { title: kase.title, employees: kase.employees, synthetic: kase.synthetic };
-  state.scheme = Object.assign({}, P.DEFAULT_SCHEME, kase.scheme, store.get("scheme") || {});
+  state.baseScheme = kase.scheme;
+  state.scheme = Object.assign({}, P.DEFAULT_SCHEME, kase.scheme, sanitizeScheme(store.get("scheme")));
 
   renderChrome();
   renderDoc();
+  checkConsistency();
   recalc();
 
+  $("doc").addEventListener("click", (e) => { if (e.target.id === "resetBtn") resetScheme(); });
   $("doc").addEventListener("input", onDocInput);
   $("doc").addEventListener("change", onDocInput);
   $("doc").addEventListener("focusout", onDocBlur);

@@ -10,12 +10,19 @@ data under the GDPR, including special categories (Art. 9 GDPR: health, via disa
 | Place | Allowed | Enforced by |
 |---|---|---|
 | Git repository | synthetic sample only | `.gitignore`, `guard_data.py` hook, CI check that the sample regenerates identically |
-| Browser (static demo) | yes, in memory and the visitor's own browser storage | imports are parsed client-side; nothing is uploaded |
-| Server process | yes, in memory; temp files deleted after the request | `api.py` uses `TemporaryDirectory` for imports |
+| Browser | yes, in memory; only the scheme parameters go to browser storage | imports are parsed client-side; the file goes to the local server only if its headers are unknown and a model is configured, and then only the header names reach the model |
+| Server process | yes, in memory; temp files deleted after the request | `TemporaryDirectory` for imports, background cleanup for exports, both tested |
 | Logs | **never** personal data | `audit.py` logs fingerprints, counts, totals; `tests/test_privacy.py` |
 | Cloud language model | aggregates only | `privacy.llm_view`, `privacy.assert_clean` on every payload, question guard, tests |
 | Local language model | aggregates, or pseudonymized rows (Personal-Nr., age, tenure, amount) | `routing.py` sets the level per route |
 | MCP clients | aggregates and Personal-Nr. | every MCP tool result passes `assert_clean` |
+
+## Untrusted input
+
+A client's spreadsheet is untrusted input. Planwerk never lets its text become a formula in
+an export (cells starting with `=`, `+`, `-` or `@` are written as text), escapes it in the
+page, limits uploads to 10 MB and the formats it can read, and serves the app with a strict
+Content Security Policy (no eval, no foreign scripts except SheetJS from cdnjs, no framing).
 
 ## Working on a real case
 

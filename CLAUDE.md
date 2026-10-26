@@ -8,12 +8,12 @@ any app. Every design decision follows from that.
 ## Commands
 
 ```bash
-python3 -m pytest -q                          # everything (~12 s, needs node + soffice)
-python3 -m pytest -q -m "not libreoffice"     # without the Excel parity test (~1 s)
-python3 -m planwerk.cli calc                  # sample case summary
-python3 -m planwerk.cli serve                 # http://127.0.0.1:8765
-python3 -m planwerk.mcp_server                # MCP over stdio (also in .mcp.json)
-python3 scripts/screenshot.py                 # needs a running server
+make lint                                     # ruff, ruff format, mypy, node --check
+make test                                     # everything (~20 s): needs node, soffice, playwright
+make quick                                    # without LibreOffice and browser tests (~2 s)
+python -m planwerk calc                       # sample case summary
+python -m planwerk serve                      # http://127.0.0.1:8765
+python -m planwerk.mcp_server                 # MCP over stdio (also in .mcp.json)
 ```
 
 ## Map
@@ -22,10 +22,12 @@ python3 scripts/screenshot.py                 # needs a running server
 |---|---|---|
 | `planwerk/engine.py` | All calculation rules. The source of truth. | engine |
 | `web/engine.js` | Line-by-line mirror of engine.py for the browser | engine |
+| `web/importer.js` | Browser import, mirror of the import rules in excel.py | excel |
 | `planwerk/excel.py` | Excel export with live formulas, client list import | excel |
 | `planwerk/privacy.py` | What a model may see; the outgoing-payload guard | ai |
 | `planwerk/assistant.py`, `routing.py` | Tool-use assistant, model routing per task | ai |
 | `planwerk/mcp_server.py`, `api.py`, `cli.py` | Interfaces over the engine | interfaces |
+| `planwerk/paths.py` | Where web/ and data/ are (`PLANWERK_HOME` in containers) | interfaces |
 | `web/index.html` | The UI | ui |
 | `docs/RULES.md` | Legal background of every rule. Read before touching the engine. | |
 
@@ -50,6 +52,9 @@ python3 scripts/screenshot.py                 # needs a running server
 ## Conventions
 
 - Python 3.11+, type hints, dataclasses, no new dependencies without a reason in the PR.
+  `ruff` and `mypy planwerk` are clean and stay clean.
+- Client data is untrusted input: anything written to Excel goes through the formula guard,
+  anything rendered in the page through `esc()` or `textContent`.
 - Domain terms stay German where lawyers use them (Sockelbetrag, Höchstbetrag, Stichtag,
   Anlage 1); code identifiers are English. Glossary in docs/RULES.md.
 - UI strings: both languages, sentence case, German written like a lawyer writes.

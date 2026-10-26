@@ -10,8 +10,8 @@ Excel model with live formulas that gives the same result to the cent.
 
 ![Planwerk: the Sozialplan as an editable document next to its cost](docs/img/desktop.png)
 
-**Live demo:** runs entirely in the browser with 140 invented employees.
-`python scripts/build_static.py` builds it; CI publishes it to GitHub Pages.
+**Demo:** the browser-only build runs with 140 invented employees and is published to GitHub
+Pages by CI on every push to `main` (`make demo` builds it locally).
 
 ## What it does
 
@@ -40,8 +40,12 @@ Excel formulas. The test suite makes them agree **exactly**:
 | `test_engine.py` | each rule, pinned with a hand-calculated example |
 | `test_js_parity.py` | browser engine == Python engine, every field of every row, 7 scenarios, compared with `==` |
 | `test_excel_parity.py` | the exported workbook, recalculated by headless LibreOffice, == engine, 6 scenarios |
-| `test_privacy.py`, `test_assistant.py` | no personal data in logs or in anything sent to a model |
-| `test_api_mcp.py`, `test_import.py`, `test_hooks.py` | interfaces, client file import, agent guardrails |
+| `test_import.py`, `test_js_import.py` | client lists (German and English notation, broken rows) read the same in browser and server; no formula injection in exports |
+| `test_privacy.py`, `test_assistant.py` | no personal data in logs or in anything sent to a model; cloud and on-prem model routes |
+| `test_browser.py` | the web app in Chromium: typing, fitting, import, export, copy, phone layout |
+| `test_api_mcp.py`, `test_cli.py`, `test_hooks.py` | interfaces, limits and error paths, agent guardrails |
+
+131 tests, run in CI on Python 3.11, 3.12 and 3.13, after ruff and mypy.
 
 The Excel parity test earned its place on day one: it found a row where 111,377.50 € was
 111,377.4999… € in floating point and rounded differently in LibreOffice. Details in
@@ -61,7 +65,7 @@ flowchart LR
     AS --> PV[privacy guard]
     XL[excel.py] --> ENG
   end
-  UI -->|export, import, ask| API
+  UI -->|Excel export, questions| API
   PV -->|aggregates only| LLM[(Claude / local model)]
   JS -. parity tests .- ENG
   XL -. LibreOffice parity .- ENG
@@ -75,13 +79,14 @@ calls answers scenario questions; Opus with adaptive thinking drafts the memo fo
 ## Run it
 
 ```bash
-pip install -e ".[dev,mcp,ai]"
-python -m planwerk.cli serve                    # http://127.0.0.1:8765
-python -m planwerk.cli calc                     # summary of the sample case
-python -m planwerk.cli fit --budget 6500000     # factor that fits the volume
-python -m planwerk.cli export -o out/Anlage1.xlsx
-ANTHROPIC_API_KEY=... python -m planwerk.cli ask "Was kostet ein Höchstbetrag von 180.000 €?"
-python -m pytest -q                             # needs node and LibreOffice for the parity tests
+make install                                # pip install -e ".[dev]"
+make serve                                  # http://127.0.0.1:8765
+python -m planwerk calc                     # summary of the sample case
+python -m planwerk fit --budget 6500000     # factor that fits the volume
+python -m planwerk export -o out/Anlage1.xlsx
+ANTHROPIC_API_KEY=... python -m planwerk ask "Was kostet ein Höchstbetrag von 180.000 €?"
+ANTHROPIC_API_KEY=... python -m planwerk memo --scenario A= --scenario B=factor=0.6
+make lint test                              # parity tests need node and LibreOffice
 ```
 
 In Claude Code, the MCP server is registered in `.mcp.json`; try `/scenario Was passiert ohne Sockelbetrag?`.
@@ -107,7 +112,10 @@ because every deployed image is kept.
 
 ## Data protection
 
-Real case data never enters the repository, the logs or a cloud prompt. See [SECURITY.md](SECURITY.md).
+Real case data never enters the repository, the logs or a cloud prompt. Client lists are read
+in the browser; the server sets a strict Content Security Policy, limits uploads, deletes temp
+files after each download, and writes client text into Excel as text so a cell like
+`=HYPERLINK(...)` cannot become a formula. See [SECURITY.md](SECURITY.md).
 The sample company and all 140 people in it are invented (`scripts/make_sample.py`, fixed seed).
 
 ## Legal
