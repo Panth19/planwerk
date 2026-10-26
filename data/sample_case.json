@@ -1,0 +1,1423 @@
+{
+ "title": "Halberg Feinmechanik GmbH, Werk Offenbach (synthetisch)",
+ "synthetic": true,
+ "scheme": {
+  "stichtag": "2026-12-31",
+  "formula": "factor",
+  "factor": 0.75,
+  "divisor": 80.0,
+  "tenure_rounding": "half_up",
+  "min_tenure_months": 6,
+  "floor_amount": 5000.0,
+  "cap_amount": 150000.0,
+  "retirement_age": 63,
+  "retirement_cap_months": 12.0,
+  "child_bonus": 3000.0,
+  "disability_bonus": 5000.0,
+  "budget": 6500000.0,
+  "budget_mode": "none",
+  "rounding_step": 1.0
+ },
+ "employees": [
+  {
+   "id": "MA-001",
+   "name": "Paul Marx",
+   "birth_date": "1979-09-16",
+   "entry_date": "2022-08-12",
+   "monthly_gross": 3170.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-002",
+   "name": "Paul Brandt",
+   "birth_date": "1980-06-23",
+   "entry_date": "2023-04-06",
+   "monthly_gross": 6110.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-003",
+   "name": "Nora Haas",
+   "birth_date": "1990-03-10",
+   "entry_date": "2018-08-04",
+   "monthly_gross": 3960.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-004",
+   "name": "Greta Fuchs",
+   "birth_date": "1978-02-15",
+   "entry_date": "2016-05-28",
+   "monthly_gross": 3390.0,
+   "children": 1,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-005",
+   "name": "Ben Kaya",
+   "birth_date": "1986-06-22",
+   "entry_date": "2021-10-01",
+   "monthly_gross": 4880.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-006",
+   "name": "Detlef Celik",
+   "birth_date": "1971-10-21",
+   "entry_date": "2024-05-22",
+   "monthly_gross": 3470.0,
+   "children": 3,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-007",
+   "name": "Ben Sommer",
+   "birth_date": "1996-07-04",
+   "entry_date": "2026-07-19",
+   "monthly_gross": 4770.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-008",
+   "name": "David Brückner",
+   "birth_date": "1984-11-10",
+   "entry_date": "2003-04-15",
+   "monthly_gross": 4330.0,
+   "children": 1,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-009",
+   "name": "Mara Zimmer",
+   "birth_date": "1986-01-17",
+   "entry_date": "2009-05-16",
+   "monthly_gross": 5430.0,
+   "children": 3,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-010",
+   "name": "Felix Kaya",
+   "birth_date": "2000-08-06",
+   "entry_date": "2026-11-22",
+   "monthly_gross": 5250.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-011",
+   "name": "Ewa Otto",
+   "birth_date": "1982-01-18",
+   "entry_date": "2005-09-19",
+   "monthly_gross": 3000.0,
+   "children": 1,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-012",
+   "name": "Heike Albers",
+   "birth_date": "1972-07-22",
+   "entry_date": "2022-04-18",
+   "monthly_gross": 6110.0,
+   "children": 3,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-013",
+   "name": "Mara Krüger",
+   "birth_date": "1970-06-01",
+   "entry_date": "2004-09-27",
+   "monthly_gross": 3180.0,
+   "children": 1,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-014",
+   "name": "Monika Vogel",
+   "birth_date": "1999-01-11",
+   "entry_date": "2020-04-23",
+   "monthly_gross": 5380.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-015",
+   "name": "Tanja Wagner",
+   "birth_date": "1963-03-13",
+   "entry_date": "1986-12-09",
+   "monthly_gross": 3670.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-016",
+   "name": "Ben Becker",
+   "birth_date": "1983-09-26",
+   "entry_date": "2005-09-10",
+   "monthly_gross": 6360.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-017",
+   "name": "Ugur Pohl",
+   "birth_date": "1980-05-14",
+   "entry_date": "2002-02-26",
+   "monthly_gross": 5980.0,
+   "children": 2,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-018",
+   "name": "Dragan Roth",
+   "birth_date": "1983-11-27",
+   "entry_date": "2016-01-31",
+   "monthly_gross": 3330.0,
+   "children": 2,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-019",
+   "name": "Zoe Engel",
+   "birth_date": "1969-05-28",
+   "entry_date": "1996-06-14",
+   "monthly_gross": 7110.0,
+   "children": 2,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-020",
+   "name": "Ida Zimmer",
+   "birth_date": "1995-02-14",
+   "entry_date": "2022-10-25",
+   "monthly_gross": 3060.0,
+   "children": 2,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-021",
+   "name": "Elif Lorenz",
+   "birth_date": "1994-10-29",
+   "entry_date": "2022-04-08",
+   "monthly_gross": 5040.0,
+   "children": 2,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-022",
+   "name": "Yusuf Dietrich",
+   "birth_date": "1978-10-06",
+   "entry_date": "2011-09-08",
+   "monthly_gross": 3410.0,
+   "children": 2,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-023",
+   "name": "Yusuf Lindner",
+   "birth_date": "1987-01-06",
+   "entry_date": "2011-08-31",
+   "monthly_gross": 3180.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-024",
+   "name": "Rania Szymańska",
+   "birth_date": "1985-01-14",
+   "entry_date": "2024-01-28",
+   "monthly_gross": 3310.0,
+   "children": 2,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-025",
+   "name": "Rania Winter",
+   "birth_date": "1989-08-10",
+   "entry_date": "2006-12-11",
+   "monthly_gross": 11100.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-026",
+   "name": "Vera Roth",
+   "birth_date": "1964-06-18",
+   "entry_date": "1988-08-30",
+   "monthly_gross": 4120.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-027",
+   "name": "Katrin Zimmer",
+   "birth_date": "1988-11-23",
+   "entry_date": "2026-10-18",
+   "monthly_gross": 3500.0,
+   "children": 1,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-028",
+   "name": "Mara Fuchs",
+   "birth_date": "1979-02-23",
+   "entry_date": "2016-01-22",
+   "monthly_gross": 5720.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-029",
+   "name": "Anna Brückner",
+   "birth_date": "1980-07-14",
+   "entry_date": "2001-11-09",
+   "monthly_gross": 3150.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-030",
+   "name": "Felix Jansen",
+   "birth_date": "2001-07-02",
+   "entry_date": "2018-09-30",
+   "monthly_gross": 3580.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-031",
+   "name": "Simon Albers",
+   "birth_date": "1970-02-25",
+   "entry_date": "1992-06-05",
+   "monthly_gross": 7340.0,
+   "children": 2,
+   "married": true,
+   "disabled": true
+  },
+  {
+   "id": "MA-032",
+   "name": "Felix Schreiber",
+   "birth_date": "1987-08-18",
+   "entry_date": "2005-11-01",
+   "monthly_gross": 3400.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-033",
+   "name": "Tanja Vogel",
+   "birth_date": "1988-11-22",
+   "entry_date": "2005-09-03",
+   "monthly_gross": 3260.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-034",
+   "name": "Ida Haas",
+   "birth_date": "1968-05-12",
+   "entry_date": "1986-01-19",
+   "monthly_gross": 3460.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-035",
+   "name": "Ewa Engel",
+   "birth_date": "1987-05-02",
+   "entry_date": "2015-01-20",
+   "monthly_gross": 7170.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-036",
+   "name": "Jürgen Nowak",
+   "birth_date": "1991-01-26",
+   "entry_date": "2015-10-22",
+   "monthly_gross": 6110.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-037",
+   "name": "Jürgen Dietrich",
+   "birth_date": "1991-05-02",
+   "entry_date": "2008-12-05",
+   "monthly_gross": 4790.0,
+   "children": 1,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-038",
+   "name": "Felix Kowalski",
+   "birth_date": "1982-06-19",
+   "entry_date": "2010-10-22",
+   "monthly_gross": 5140.0,
+   "children": 2,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-039",
+   "name": "Petra Zimmer",
+   "birth_date": "1989-11-27",
+   "entry_date": "2016-10-30",
+   "monthly_gross": 7170.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-040",
+   "name": "Nora Hahn",
+   "birth_date": "1982-10-07",
+   "entry_date": "2016-01-19",
+   "monthly_gross": 3330.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-041",
+   "name": "Tim Gerber",
+   "birth_date": "1984-03-21",
+   "entry_date": "2020-01-30",
+   "monthly_gross": 3650.0,
+   "children": 1,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-042",
+   "name": "Lukas Pohl",
+   "birth_date": "1980-05-29",
+   "entry_date": "1997-12-26",
+   "monthly_gross": 4290.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-043",
+   "name": "Jonas Petrović",
+   "birth_date": "1991-01-25",
+   "entry_date": "2009-01-26",
+   "monthly_gross": 5900.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-044",
+   "name": "Vera Szymańska",
+   "birth_date": "1969-06-04",
+   "entry_date": "2001-07-17",
+   "monthly_gross": 3500.0,
+   "children": 2,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-045",
+   "name": "Olga Jansen",
+   "birth_date": "1975-12-05",
+   "entry_date": "1993-06-02",
+   "monthly_gross": 3570.0,
+   "children": 2,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-046",
+   "name": "Zoe Roth",
+   "birth_date": "1988-12-06",
+   "entry_date": "2007-06-15",
+   "monthly_gross": 3410.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-047",
+   "name": "Ewa Nowak",
+   "birth_date": "1974-04-15",
+   "entry_date": "2004-05-19",
+   "monthly_gross": 6740.0,
+   "children": 1,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-048",
+   "name": "Sabine Lorenz",
+   "birth_date": "1988-11-05",
+   "entry_date": "2007-12-25",
+   "monthly_gross": 4920.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-049",
+   "name": "Ben Engel",
+   "birth_date": "1986-03-30",
+   "entry_date": "2007-08-21",
+   "monthly_gross": 5310.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-050",
+   "name": "Tim Vogel",
+   "birth_date": "1993-05-21",
+   "entry_date": "2025-03-14",
+   "monthly_gross": 3210.0,
+   "children": 1,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-051",
+   "name": "Marek Vogel",
+   "birth_date": "1975-04-25",
+   "entry_date": "1998-10-05",
+   "monthly_gross": 6110.0,
+   "children": 3,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-052",
+   "name": "Ben Fuchs",
+   "birth_date": "1989-07-13",
+   "entry_date": "2006-10-18",
+   "monthly_gross": 7330.0,
+   "children": 1,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-053",
+   "name": "Monika Ulrich",
+   "birth_date": "1972-12-09",
+   "entry_date": "2024-07-20",
+   "monthly_gross": 4770.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-054",
+   "name": "David Albers",
+   "birth_date": "1986-08-07",
+   "entry_date": "2026-07-29",
+   "monthly_gross": 6210.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-055",
+   "name": "Jan Sommer",
+   "birth_date": "1973-10-13",
+   "entry_date": "1996-04-11",
+   "monthly_gross": 3470.0,
+   "children": 1,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-056",
+   "name": "David Vogel",
+   "birth_date": "1974-03-25",
+   "entry_date": "1996-03-24",
+   "monthly_gross": 3540.0,
+   "children": 0,
+   "married": false,
+   "disabled": true
+  },
+  {
+   "id": "MA-057",
+   "name": "Ugur Roth",
+   "birth_date": "1989-04-10",
+   "entry_date": "2016-06-28",
+   "monthly_gross": 4150.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-058",
+   "name": "Malte Szymańska",
+   "birth_date": "1969-11-13",
+   "entry_date": "2026-10-28",
+   "monthly_gross": 5060.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-059",
+   "name": "Jürgen Peters",
+   "birth_date": "1966-06-06",
+   "entry_date": "2002-05-19",
+   "monthly_gross": 4850.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-060",
+   "name": "Dragan Wagner",
+   "birth_date": "1983-09-07",
+   "entry_date": "2014-06-22",
+   "monthly_gross": 3270.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-061",
+   "name": "Hannes Becker",
+   "birth_date": "1977-04-25",
+   "entry_date": "2005-07-22",
+   "monthly_gross": 3610.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-062",
+   "name": "Marek Peters",
+   "birth_date": "1975-04-22",
+   "entry_date": "1992-12-03",
+   "monthly_gross": 6340.0,
+   "children": 3,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-063",
+   "name": "Tim Lindner",
+   "birth_date": "1989-01-07",
+   "entry_date": "2019-01-23",
+   "monthly_gross": 11170.0,
+   "children": 3,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-064",
+   "name": "Felix Gerber",
+   "birth_date": "1980-04-08",
+   "entry_date": "2012-02-08",
+   "monthly_gross": 5040.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-065",
+   "name": "Ewa Pohl",
+   "birth_date": "1979-04-14",
+   "entry_date": "2002-05-07",
+   "monthly_gross": 6600.0,
+   "children": 1,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-066",
+   "name": "David Haas",
+   "birth_date": "1984-09-18",
+   "entry_date": "2019-08-10",
+   "monthly_gross": 4270.0,
+   "children": 2,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-067",
+   "name": "Ida Marx",
+   "birth_date": "1982-04-14",
+   "entry_date": "2001-11-19",
+   "monthly_gross": 4340.0,
+   "children": 2,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-068",
+   "name": "Monika Nowak",
+   "birth_date": "1976-05-02",
+   "entry_date": "1995-06-20",
+   "monthly_gross": 4750.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-069",
+   "name": "Tanja Albers",
+   "birth_date": "1990-03-16",
+   "entry_date": "2007-11-14",
+   "monthly_gross": 3570.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-070",
+   "name": "Simon Ostermann",
+   "birth_date": "1986-12-18",
+   "entry_date": "2013-01-03",
+   "monthly_gross": 7370.0,
+   "children": 1,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-071",
+   "name": "Selin Quast",
+   "birth_date": "1987-06-01",
+   "entry_date": "2005-11-04",
+   "monthly_gross": 3530.0,
+   "children": 1,
+   "married": true,
+   "disabled": true
+  },
+  {
+   "id": "MA-072",
+   "name": "Simon Ulrich",
+   "birth_date": "1989-07-07",
+   "entry_date": "2025-06-22",
+   "monthly_gross": 4290.0,
+   "children": 2,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-073",
+   "name": "Kai Kowalski",
+   "birth_date": "1983-05-12",
+   "entry_date": "2012-11-18",
+   "monthly_gross": 3940.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-074",
+   "name": "Rania Ulrich",
+   "birth_date": "1977-08-31",
+   "entry_date": "2003-04-18",
+   "monthly_gross": 4640.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-075",
+   "name": "Tim Ostermann",
+   "birth_date": "1980-08-31",
+   "entry_date": "2009-04-20",
+   "monthly_gross": 5130.0,
+   "children": 2,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-076",
+   "name": "Uwe Quast",
+   "birth_date": "1976-10-16",
+   "entry_date": "2017-02-22",
+   "monthly_gross": 4260.0,
+   "children": 2,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-077",
+   "name": "Ida Otto",
+   "birth_date": "1974-10-16",
+   "entry_date": "2009-11-28",
+   "monthly_gross": 5160.0,
+   "children": 2,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-078",
+   "name": "Zoe Thiel",
+   "birth_date": "1990-03-24",
+   "entry_date": "2022-05-29",
+   "monthly_gross": 9700.0,
+   "children": 1,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-079",
+   "name": "Hannes Fuchs",
+   "birth_date": "1990-06-30",
+   "entry_date": "2015-02-25",
+   "monthly_gross": 3210.0,
+   "children": 1,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-080",
+   "name": "Tim Brückner",
+   "birth_date": "1983-03-07",
+   "entry_date": "2016-07-15",
+   "monthly_gross": 4670.0,
+   "children": 2,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-081",
+   "name": "Lukas Thiel",
+   "birth_date": "1973-03-14",
+   "entry_date": "1999-08-19",
+   "monthly_gross": 5140.0,
+   "children": 3,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-082",
+   "name": "Petra Wagner",
+   "birth_date": "1998-08-28",
+   "entry_date": "2018-02-16",
+   "monthly_gross": 5050.0,
+   "children": 2,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-083",
+   "name": "Lukas Brückner",
+   "birth_date": "1998-03-30",
+   "entry_date": "2015-09-01",
+   "monthly_gross": 3520.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-084",
+   "name": "Ewa Brandt",
+   "birth_date": "1987-03-12",
+   "entry_date": "2014-09-02",
+   "monthly_gross": 11400.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-085",
+   "name": "Selin Lorenz",
+   "birth_date": "1976-07-14",
+   "entry_date": "1994-02-02",
+   "monthly_gross": 4100.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-086",
+   "name": "Lukas Engel",
+   "birth_date": "1978-08-11",
+   "entry_date": "1998-02-07",
+   "monthly_gross": 5510.0,
+   "children": 3,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-087",
+   "name": "Jonas Vogel",
+   "birth_date": "1973-07-27",
+   "entry_date": "1994-09-18",
+   "monthly_gross": 5730.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-088",
+   "name": "Jan Fuchs",
+   "birth_date": "1982-03-22",
+   "entry_date": "2000-05-17",
+   "monthly_gross": 3730.0,
+   "children": 1,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-089",
+   "name": "Katrin Peters",
+   "birth_date": "1999-03-28",
+   "entry_date": "2021-06-17",
+   "monthly_gross": 4000.0,
+   "children": 1,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-090",
+   "name": "Katrin Gerber",
+   "birth_date": "1989-11-29",
+   "entry_date": "2013-08-01",
+   "monthly_gross": 9890.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-091",
+   "name": "Petra Becker",
+   "birth_date": "1979-02-10",
+   "entry_date": "2002-09-21",
+   "monthly_gross": 3790.0,
+   "children": 1,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-092",
+   "name": "Hannes Kowalski",
+   "birth_date": "1985-04-09",
+   "entry_date": "2002-09-15",
+   "monthly_gross": 8770.0,
+   "children": 1,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-093",
+   "name": "Lukas Ostermann",
+   "birth_date": "1981-03-23",
+   "entry_date": "2023-11-22",
+   "monthly_gross": 5500.0,
+   "children": 1,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-094",
+   "name": "Elif Winter",
+   "birth_date": "1990-10-30",
+   "entry_date": "2007-09-27",
+   "monthly_gross": 6520.0,
+   "children": 2,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-095",
+   "name": "Mara Ulrich",
+   "birth_date": "1988-01-24",
+   "entry_date": "2020-12-23",
+   "monthly_gross": 3410.0,
+   "children": 1,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-096",
+   "name": "Lukas Lorenz",
+   "birth_date": "1991-10-05",
+   "entry_date": "2017-09-01",
+   "monthly_gross": 3380.0,
+   "children": 2,
+   "married": false,
+   "disabled": true
+  },
+  {
+   "id": "MA-097",
+   "name": "Ben Marx",
+   "birth_date": "1984-04-01",
+   "entry_date": "2004-09-29",
+   "monthly_gross": 4170.0,
+   "children": 2,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-098",
+   "name": "Lukas Jansen",
+   "birth_date": "1977-07-23",
+   "entry_date": "1996-03-14",
+   "monthly_gross": 2990.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-099",
+   "name": "Rania Brandt",
+   "birth_date": "1988-04-01",
+   "entry_date": "2006-05-07",
+   "monthly_gross": 3550.0,
+   "children": 3,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-100",
+   "name": "Nora Winter",
+   "birth_date": "1971-07-29",
+   "entry_date": "1999-11-23",
+   "monthly_gross": 3240.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-101",
+   "name": "Katrin Otto",
+   "birth_date": "1984-11-17",
+   "entry_date": "2016-04-28",
+   "monthly_gross": 3700.0,
+   "children": 2,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-102",
+   "name": "Rainer Pohl",
+   "birth_date": "1977-12-28",
+   "entry_date": "1994-09-17",
+   "monthly_gross": 4100.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-103",
+   "name": "Petra Schreiber",
+   "birth_date": "1980-02-20",
+   "entry_date": "2007-09-10",
+   "monthly_gross": 11070.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-104",
+   "name": "Dragan Ulrich",
+   "birth_date": "1986-11-07",
+   "entry_date": "2005-05-31",
+   "monthly_gross": 3220.0,
+   "children": 1,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-105",
+   "name": "Monika Lindner",
+   "birth_date": "1980-08-08",
+   "entry_date": "1998-01-20",
+   "monthly_gross": 7360.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-106",
+   "name": "Elif Pohl",
+   "birth_date": "1965-06-16",
+   "entry_date": "1990-06-14",
+   "monthly_gross": 5160.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-107",
+   "name": "Felix Fuchs",
+   "birth_date": "2003-04-12",
+   "entry_date": "2025-04-18",
+   "monthly_gross": 4730.0,
+   "children": 2,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-108",
+   "name": "Ben Peters",
+   "birth_date": "1995-08-22",
+   "entry_date": "2014-10-08",
+   "monthly_gross": 6990.0,
+   "children": 1,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-109",
+   "name": "Lea Zimmer",
+   "birth_date": "1993-05-16",
+   "entry_date": "2018-01-24",
+   "monthly_gross": 3730.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-110",
+   "name": "Tanja Brandt",
+   "birth_date": "1968-06-16",
+   "entry_date": "2000-01-07",
+   "monthly_gross": 6040.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-111",
+   "name": "Dragan Yilmaz",
+   "birth_date": "1983-05-10",
+   "entry_date": "2014-01-11",
+   "monthly_gross": 4730.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-112",
+   "name": "Marek Albers",
+   "birth_date": "1965-03-25",
+   "entry_date": "1985-05-05",
+   "monthly_gross": 5210.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-113",
+   "name": "Ugur Kaya",
+   "birth_date": "1982-03-21",
+   "entry_date": "2025-10-20",
+   "monthly_gross": 5940.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-114",
+   "name": "Greta Lorenz",
+   "birth_date": "1985-01-31",
+   "entry_date": "2016-07-14",
+   "monthly_gross": 4570.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-115",
+   "name": "Monika Petrović",
+   "birth_date": "1992-06-24",
+   "entry_date": "2014-07-10",
+   "monthly_gross": 3260.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-116",
+   "name": "Elif Nowak",
+   "birth_date": "1965-11-12",
+   "entry_date": "1993-11-29",
+   "monthly_gross": 10180.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-117",
+   "name": "Lukas Albers",
+   "birth_date": "1981-11-03",
+   "entry_date": "2024-02-10",
+   "monthly_gross": 5420.0,
+   "children": 2,
+   "married": true,
+   "disabled": true
+  },
+  {
+   "id": "MA-118",
+   "name": "Frank Lorenz",
+   "birth_date": "1994-02-16",
+   "entry_date": "2012-04-30",
+   "monthly_gross": 2920.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-119",
+   "name": "Petra Jansen",
+   "birth_date": "1980-02-26",
+   "entry_date": "2001-08-08",
+   "monthly_gross": 4660.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-120",
+   "name": "Rania Marx",
+   "birth_date": "1982-05-15",
+   "entry_date": "2001-04-12",
+   "monthly_gross": 7930.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-121",
+   "name": "Paul Ulrich",
+   "birth_date": "1965-04-29",
+   "entry_date": "2005-01-09",
+   "monthly_gross": 3420.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-122",
+   "name": "Tanja Lorenz",
+   "birth_date": "1989-04-01",
+   "entry_date": "2016-11-29",
+   "monthly_gross": 6520.0,
+   "children": 1,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-123",
+   "name": "Petra Lorenz",
+   "birth_date": "1983-08-10",
+   "entry_date": "2014-07-17",
+   "monthly_gross": 3840.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-124",
+   "name": "Rainer Quast",
+   "birth_date": "1979-02-19",
+   "entry_date": "2015-12-18",
+   "monthly_gross": 5670.0,
+   "children": 1,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-125",
+   "name": "Lukas Kowalski",
+   "birth_date": "1970-02-02",
+   "entry_date": "1996-10-28",
+   "monthly_gross": 3340.0,
+   "children": 1,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-126",
+   "name": "Hannes Jansen",
+   "birth_date": "1984-11-30",
+   "entry_date": "2010-11-07",
+   "monthly_gross": 2990.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-127",
+   "name": "Rania Hahn",
+   "birth_date": "1989-04-11",
+   "entry_date": "2018-05-22",
+   "monthly_gross": 7680.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-128",
+   "name": "Anna Wagner",
+   "birth_date": "1975-12-16",
+   "entry_date": "1997-03-19",
+   "monthly_gross": 5240.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-129",
+   "name": "Frank Otto",
+   "birth_date": "1975-08-21",
+   "entry_date": "1994-02-12",
+   "monthly_gross": 6890.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-130",
+   "name": "Paul Jansen",
+   "birth_date": "1990-01-27",
+   "entry_date": "2025-11-21",
+   "monthly_gross": 10180.0,
+   "children": 0,
+   "married": true,
+   "disabled": true
+  },
+  {
+   "id": "MA-131",
+   "name": "Katrin Albers",
+   "birth_date": "1976-02-12",
+   "entry_date": "1997-05-30",
+   "monthly_gross": 4630.0,
+   "children": 1,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-132",
+   "name": "Olga Vogel",
+   "birth_date": "1983-02-17",
+   "entry_date": "2020-10-05",
+   "monthly_gross": 5340.0,
+   "children": 3,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-133",
+   "name": "Olga Petrović",
+   "birth_date": "1976-02-13",
+   "entry_date": "2025-02-03",
+   "monthly_gross": 3680.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-134",
+   "name": "Kai Szymańska",
+   "birth_date": "1973-07-05",
+   "entry_date": "2006-04-13",
+   "monthly_gross": 3810.0,
+   "children": 2,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-135",
+   "name": "Ida Yilmaz",
+   "birth_date": "2003-05-20",
+   "entry_date": "2021-10-04",
+   "monthly_gross": 3260.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-136",
+   "name": "Frank Albers",
+   "birth_date": "1974-08-14",
+   "entry_date": "2006-09-15",
+   "monthly_gross": 3370.0,
+   "children": 1,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-137",
+   "name": "Jürgen Engel",
+   "birth_date": "1979-10-06",
+   "entry_date": "2014-04-11",
+   "monthly_gross": 4400.0,
+   "children": 0,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-138",
+   "name": "Birgit Gerber",
+   "birth_date": "1974-04-21",
+   "entry_date": "2020-02-20",
+   "monthly_gross": 11030.0,
+   "children": 0,
+   "married": true,
+   "disabled": false
+  },
+  {
+   "id": "MA-139",
+   "name": "Greta Szymańska",
+   "birth_date": "1982-03-22",
+   "entry_date": "2022-07-08",
+   "monthly_gross": 4670.0,
+   "children": 3,
+   "married": false,
+   "disabled": false
+  },
+  {
+   "id": "MA-140",
+   "name": "Malte Peters",
+   "birth_date": "1980-03-01",
+   "entry_date": "2013-06-16",
+   "monthly_gross": 2910.0,
+   "children": 2,
+   "married": true,
+   "disabled": false
+  }
+ ]
+}

@@ -1,0 +1,20 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+dist/
+build/
+*.egg-info/
+
+# Real case data never enters the repo. Work on real cases in ~/planwerk-cases/.
+cases/
+*.real.json
+*.real.xlsx
+/out/
+
+# Local logs and secrets
+logs/
+.env
+.env.*
+!.env.example
+.claude/settings.local.json

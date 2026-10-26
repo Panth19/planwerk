@@ -1,0 +1,35 @@
+[project]
+name = "planwerk"
+version = "0.9.0"
+description = "Sozialplan calculator: turns labour-law restructuring Excel models into a tested web app, an MCP server and an AI assistant."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "openpyxl>=3.1",
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+]
+
+[project.optional-dependencies]
+mcp = ["mcp>=2.0"]
+ai = ["anthropic>=0.40"]
+dev = ["pytest>=8", "httpx>=0.27"]
+
+[project.scripts]
+planwerk = "planwerk.cli:main"
+planwerk-mcp = "planwerk.mcp_server:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "libreoffice: needs a headless LibreOffice (soffice) on PATH",
+    "node: needs Node.js on PATH",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["planwerk*"]
